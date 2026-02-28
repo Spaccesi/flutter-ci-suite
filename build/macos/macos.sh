@@ -36,7 +36,7 @@ FLAGS="--$BUILD_MODE"
 [ "$FLAVOR" != '' ] && FLAGS="$FLAGS --flavor=$FLAVOR"
 [ "$TARGET" != '' ] && FLAGS="$FLAGS --target=$TARGET"
 [ "$NO_PUB" == 'true' ] && FLAGS="$FLAGS --no-pub"
-[ "$OBFUSCATE" == 'true' ] && FLAGS="$FLAGS --obfuscate"
+[ "$OBFUSCATE" != 'true' ] && FLAGS="$FLAGS --no-obfuscate"
 
 echo "▶️ Running flutter build macos with flags: $FLAGS"
 flutter build macos $FLAGS

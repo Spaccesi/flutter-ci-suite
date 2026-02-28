@@ -29,7 +29,7 @@ FLAGS="--$BUILD_MODE"
 [ "$EXPORT_METHOD" != '' ] && FLAGS="$FLAGS --export-method $EXPORT_METHOD"
 [ "$EXPORT_OPTIONS_PLIST" != '' ] && FLAGS="$FLAGS --export-options-plist=$EXPORT_OPTIONS_PLIST"
 [ "$NO_PUB" == 'true' ] && FLAGS="$FLAGS --no-pub"
-[ "$OBFUSCATE" == 'true' ] && FLAGS="$FLAGS --obfuscate"
+[ "$OBFUSCATE" != 'true' ] && FLAGS="$FLAGS --no-obfuscate"
 [ "$CODE_SIGN" == 'false' ] && FLAGS="$FLAGS --no-codesign"
 
 echo "▶️ Running flutter build ipa with flags: $FLAGS"
