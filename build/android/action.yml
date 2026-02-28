@@ -54,7 +54,7 @@ inputs:
     description: 'Target file for the build (optional)'
     required: false
   obfuscate:
-    description: 'Whether to obfuscate the build (default: false)'
+    description: 'Whether to obfuscate the build'
     required: false
 
 runs:

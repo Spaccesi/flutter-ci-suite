@@ -39,49 +39,55 @@ inputs:
     description: 'Path to a file containing a comma-separated list of test device IDs to distribute the app to (optional, only for iOS)'
     required: false
   firebase-test-username:
-    description: 'Username for authenticating with the Firebase CLI (optional, only needed if not using a service account key)'
+    description: 'Username for authenticating with the Firebase CLI (optional)'
     required: false
   firebase-test-username-file:
-    description: 'Path to a file containing the username for authenticating with the Firebase CLI (optional, only needed if not using a service account key)'
+    description: 'Path to a file containing the username for authenticating with the Firebase CLI (optional)'
     required: false
   firebase-test-password:
-    description: 'Password for authenticating with the Firebase CLI (optional, only needed if not using a service account key)'
+    description: 'Password for authenticating with the Firebase CLI (optional)'
     required: false
   firebase-test-password-file:
-    description: 'Path to a file containing the password for authenticating with the Firebase CLI (optional, only needed if not using a service account key)'
+    description: 'Path to a file containing the password for authenticating with the Firebase CLI (optional)'
     required: false
   firebase-test-non-blocking:
-    description: 'Whether to run the upload process in non-blocking mode, which allows the workflow to continue without waiting for the upload to complete (default: false)'
+    description: 'Whether to run the upload process in non-blocking mode (default: false)'
     required: false
+    default: 'false'
   firebase-test-case-ids:
     description: 'Comma-separated list of test case IDs to associate with this distribution (optional)'
     required: false
   firebase-test-case-ids-file:
     description: 'Path to a file containing a comma-separated list of test case IDs to associate with this distribution (optional)'
     required: false
+
 runs:
   using: 'composite'
   steps:
-    - name: Install Firebase CLI
+    - name: Add permissions
+      run: chmod +x $GITHUB_ACTION_PATH/firebase-app-distribution.sh
       shell: bash
-      run: |
-        npm install -g firebase-tools
 
     - name: Publish to Firebase App Distribution
-      shell: bash
       env:
-        FIREBASE_TOKEN: ${{ inputs.firebase-token }}
-      run: |
-        firebase appdistribution:diqstribute \
-          --app ${{ inputs.firebase-app-id }} \
-          ${ inputs.firebase-groups && "--groups " + inputs.firebase-groups } \
-          ${ inputs.firebase-testers && "--testers " + inputs.firebase-testers } \
-          ${ inputs.firebase-release-notes && "--release-notes " + inputs.firebase-release-notes } \
-          ${ inputs.debug == "true" && "--debug" } \
-          ${ inputs.firebase-test-devices && "--test-devices " + inputs.firebase-test-devices } \
-          ${ inputs.firebase-test-username && "--test-username " + inputs.firebase-test-username } \
-          ${ inputs.firebase-test-password && "--test-password " + inputs.firebase-test-password } \
-          ${ inputs.firebase-test-non-blocking == "true" && "--non-blocking" } \
-          ${ inputs.firebase-test-case-ids && "--test-case-ids " + inputs.firebase-test-case-ids } \
-          ${ inputs.firebase-test-case-ids-file && "--test-case-ids-file " + inputs.firebase-test-case-ids-file } \
-          ${{ inputs.firebase-release-binary-file }}
+        FIREBASE_RELEASE_BINARY_FILE: ${{ inputs.firebase-release-binary-file }}
+        FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ inputs.firebase-service-account-base64 }}
+        FIREBASE_APP_ID: ${{ inputs.firebase-app-id }}
+        FIREBASE_GROUPS: ${{ inputs.firebase-groups }}
+        FIREBASE_GROUPS_FILE: ${{ inputs.firebase-groups-file }}
+        FIREBASE_TESTERS: ${{ inputs.firebase-testers }}
+        FIREBASE_TESTERS_FILE: ${{ inputs.firebase-testers-file }}
+        FIREBASE_RELEASE_NOTES: ${{ inputs.firebase-release-notes }}
+        FIREBASE_RELEASE_NOTES_FILE: ${{ inputs.firebase-release-notes-file }}
+        FIREBASE_DEBUG: ${{ inputs.firebase-debug }}
+        FIREBASE_TEST_DEVICES: ${{ inputs.firebase-test-devices }}
+        FIREBASE_TEST_DEVICES_FILE: ${{ inputs.firebase-test-devices-file }}
+        FIREBASE_TEST_USERNAME: ${{ inputs.firebase-test-username }}
+        FIREBASE_TEST_USERNAME_FILE: ${{ inputs.firebase-test-username-file }}
+        FIREBASE_TEST_PASSWORD: ${{ inputs.firebase-test-password }}
+        FIREBASE_TEST_PASSWORD_FILE: ${{ inputs.firebase-test-password-file }}
+        FIREBASE_TEST_NON_BLOCKING: ${{ inputs.firebase-test-non-blocking }}
+        FIREBASE_TEST_CASE_IDS: ${{ inputs.firebase-test-case-ids }}
+        FIREBASE_TEST_CASE_IDS_FILE: ${{ inputs.firebase-test-case-ids-file }}
+      run: $GITHUB_ACTION_PATH/firebase-app-distribution.sh
+      shell: bash
