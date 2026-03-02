@@ -90,7 +90,7 @@ runs:
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/license/license.sh
-        $GITHUB_ACTION_PATH/llicense/icense.sh
+        $GITHUB_ACTION_PATH/license/license.sh
     
     - name: Run Tests
       if: ${{ inputs.run-test == 'true' }}
