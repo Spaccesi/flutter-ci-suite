@@ -53,8 +53,8 @@ runs:
   using: 'composite'
   steps:
     - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/web.sh
       shell: bash
+      run: chmod +x $GITHUB_ACTION_PATH/web.sh
 
     - name: Build web app
       env:
@@ -68,5 +68,5 @@ runs:
         BASE_HREF: ${{ inputs.base-href }}
         STATIC_ASSETS_URL: ${{ inputs.static-assets-url }}
         WASM: ${{ inputs.wasm }}
-      run: $GITHUB_ACTION_PATH/web.sh
       shell: bash
+      run: $GITHUB_ACTION_PATH/web.sh

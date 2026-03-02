@@ -60,10 +60,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/android.sh
-      shell: bash
-
     - name: Build Android app
       env:
         ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
@@ -80,5 +76,7 @@ runs:
         NO_PUB: ${{ inputs.no-pub }}
         TARGET: ${{ inputs.target }}
         OBFUSCATE: ${{ inputs.obfuscate }}
-      run: $GITHUB_ACTION_PATH/android.sh
       shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/android.sh
+        $GITHUB_ACTION_PATH/android.sh

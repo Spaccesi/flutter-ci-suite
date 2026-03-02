@@ -16,15 +16,13 @@ inputs:
 
 runs:
   using: 'composite'
-  steps:
-    - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/analyze.sh
-      shell: bash
-      
+  steps:      
     - name: Run Analysis
       env:
         ANALYZE_FAILS_IF_INFOS: ${{ inputs.analyze-fails-if-infos }}
         ANALYZE_FAILS_IF_WARNINGS: ${{ inputs.analyze-fails-if-warnings }}
         NO_PUB: ${{ inputs.no-pub }}
-      run: $GITHUB_ACTION_PATH/analyze.sh
       shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/analyze.sh
+        $GITHUB_ACTION_PATH/analyze.sh

@@ -1,7 +1,7 @@
 name: Code Generation with l10n
 description: 'Automatically discovers and runs code generation using l10n for all Flutter packages in the repository.'
 inputs:
-  fails-if-untranslated:
+  gen-l10n-fails-if-untranslated:
     description: 'Whether to fail the action if untranslated strings are found.'
     required: false
     default: 'false'
@@ -11,6 +11,9 @@ runs:
   steps:
     - name: Run gen-l10n
       env:
-        FAILS_IF_UNTRANSLATED: ${{ inputs.fails-if-untranslated }}
-      run: gen-l10n.sh
+        FAILS_IF_UNTRANSLATED: ${{ inputs.gen-l10n-fails-if-untranslated }}
       shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+        $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+      

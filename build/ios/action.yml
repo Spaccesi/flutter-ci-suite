@@ -65,8 +65,8 @@ runs:
   using: 'composite'
   steps:
     - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/ios.sh
       shell: bash
+      run: chmod +x $GITHUB_ACTION_PATH/ios.sh
 
     - name: Build iOS app
       env:
@@ -84,5 +84,5 @@ runs:
         CODE_SIGN: ${{ inputs.code-sign }}
         EXPORT_METHOD: ${{ inputs.export-method }}
         EXPORT_OPTIONS_PLIST: ${{ inputs.export-options-plist }}
-      run: $GITHUB_ACTION_PATH/ios.sh
       shell: bash
+      run: $GITHUB_ACTION_PATH/ios.sh

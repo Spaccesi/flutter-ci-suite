@@ -45,10 +45,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/test.sh
-      shell: bash
-
     - name: Run Tests
       env:
         DART_DEFINE: ${{ inputs.dart-define }}
@@ -61,5 +57,7 @@ runs:
         CREATE_COVERAGE_BADGE: ${{ inputs.create-coverage-badge }}
         NO_PUB: ${{ inputs.no-pub }}
         COVERAGE_BADGE_OUTPUT_PATH: ${{ inputs.coverage-badge-output-path }}
-      run: $GITHUB_ACTION_PATH/test.sh
       shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/test.sh
+        $GITHUB_ACTION_PATH/test.sh

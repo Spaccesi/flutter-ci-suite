@@ -73,32 +73,27 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Add permissions
-      run: |
-        chmod +x $GITHUB_ACTION_PATH/check/analyze.sh
-        chmod +x $GITHUB_ACTION_PATH/check/license.sh
-        chmod +x $GITHUB_ACTION_PATH/check/test.sh
-      shell: bash
-
     - name: Run Analyze
       if: ${{ inputs.run-analyze == 'true' }}
-      shell: bash
       env:
         ANALYZE_FAILS_IF_INFOS: ${{ inputs.analyze-fails-if-infos }}
         ANALYZE_FAILS_IF_WARNINGS: ${{ inputs.analyze-fails-if-warnings }}
-      run: $GITHUB_ACTION_PATH/check/analyze.sh
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/analyze/analyze.sh
+        $GITHUB_ACTION_PATH/analyze/analyze.sh
       
     - name: Check Licenses
       if: ${{ inputs.run-license == 'true' }}
-      shell: bash
       env:
         COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.compatible-licenses-conf-path }}
-      run: $GITHUB_ACTION_PATH/check/license.sh
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/license/license.sh
+        $GITHUB_ACTION_PATH/llicense/icense.sh
     
     - name: Run Tests
       if: ${{ inputs.run-test == 'true' }}
-      shell: bash
-      run: $GITHUB_ACTION_PATH/check/test.sh
       env:
         DART_DEFINE: ${{ inputs.dart-define }}
         DART_DEFINE_FROM_FILE: ${{ inputs.dart-define-from-file }}
@@ -110,4 +105,8 @@ runs:
         CREATE_COVERAGE_BADGE: ${{ inputs.create-coverage-badge }}
         NO_PUB: ${{ inputs.no-pub }}
         COVERAGE_BADGE_OUTPUT_PATH: ${{ inputs.coverage-badge-output-path }}
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/test/test.sh
+        $GITHUB_ACTION_PATH/test/test.sh
      

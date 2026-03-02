@@ -92,9 +92,6 @@ inputs:
   apple-api-key-id:
     description: 'Apple API key ID. Required for publishing to App Store Connect.'
     required: false
-  apple-api-key-issuer:
-    description: 'Apple API key issuer. Required for publishing to App Store Connect.'
-    required: false
   apple-api-key-content:
     description: 'Apple API key content. Required for publishing to App Store Connect.'
     required: false
@@ -158,10 +155,10 @@ inputs:
   android-store-file-base64:
     description: 'Base64 encoded JKS or PKCS12 file containing the Android signing keystore. Required for building and signing Android apps.'
     required: false
-  android-keystore-alias:
+  android-key-alias:
     description: 'Alias of the key to use from the Android signing keystore. Required for building and signing Android apps.'
     required: false
-  android-keystore-password:
+  android-store-password:
     description: 'Password for the Android signing keystore. Required for building and signing Android apps.'
     required: false
   android-key-password:
@@ -174,7 +171,7 @@ inputs:
   android-local-properties-file:
     description: 'Path to a local.properties file containing the path to the Android SDK. This is required if the Android SDK is not available in the default location on the runner.'
     required: false
-  android-playstore-account-key:
+  android-service-account-json-base64:
     description: 'Base64 encoded JSON key file for the Google Play Store service account. Required for publishing to Google Play Store.'
     required: false
 
@@ -185,7 +182,7 @@ inputs:
   microsoft-partner-center-seller-id:
     description: 'Microsoft Partner Center seller ID. Required for publishing to Microsoft Store.'
     required: false
-  microsoft-center-client-id:
+  microsoft-partner-center-client-id:
     description: 'Microsoft Partner Center client ID. Required for publishing to Microsoft Store.'
     required: false
   microsoft-partner-center-client-secret:
@@ -230,11 +227,11 @@ runs:
           if [ -z "${{ inputs.android-store-file-base64 }}" ]; then
             ERRORS+=("'android-store-file-base64' is required when building Android in '$BUILD_MODE' mode.")
           fi
-          if [ -z "${{ inputs.android-keystore-alias }}" ]; then
-            ERRORS+=("'android-keystore-alias' is required when building Android in '$BUILD_MODE' mode.")
+          if [ -z "${{ inputs.android-key-alias }}" ]; then
+            ERRORS+=("'android-key-alias' is required when building Android in '$BUILD_MODE' mode.")
           fi
-          if [ -z "${{ inputs.android-keystore-password }}" ]; then
-            ERRORS+=("'android-keystore-password' is required when building Android in '$BUILD_MODE' mode.")
+          if [ -z "${{ inputs.android-store-password }}" ]; then
+            ERRORS+=("'android-store-password' is required when building Android in '$BUILD_MODE' mode.")
           fi
           if [ -z "${{ inputs.android-key-password }}" ]; then
             ERRORS+=("'android-key-password' is required when building Android in '$BUILD_MODE' mode.")
@@ -289,117 +286,154 @@ runs:
         cache: true
 
     # -- Prepare -----------------------------------------------------
-    - name: Prepare Repository
-      uses: Spaccesi/flutter-actions-suite/prepare@main
-      with:
-        run-build-runner: ${{ inputs.run-build-runner }}
-        run-gen-l10n: ${{ inputs.run-gen-l10n }}
-        gen-l10n-fails-if-untranslated: ${{ inputs.gen-l10n-fails-if-untranslated }}
+    - name: Run Build Runner
+      shell: bash
+      if: ${{ inputs.run-build-runner != 'false' }}
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+        $GITHUB_ACTION_PATH/build_runner/build_runner.sh
 
+    - name: Run gen-l10n
+      shell: bash
+      if: ${{ inputs.run-gen-l10n != 'false' }}
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/prepare/gen-l10n/gen-l10n.sh
+        $GITHUB_ACTION_PATH/prepare/gen-l10n/gen-l10n.sh
+      env: 
+        FAILS_IF_UNTRANSLATED: ${{ inputs.gen-l10n-fails-if-untranslated }}
+      
     # -- Check -----------------------------------------------------
-    - name: Run Checks
-      uses: Spaccesi/flutter-actions-suite/check@main
-      with:
-        run-analyze: ${{ inputs.run-analyze }}
-        analyze-fails-if-infos: ${{ inputs.analyze-fails-if-infos }}
-        analyze-fails-if-warnings: ${{ inputs.analyze-fails-if-warnings }}
-        run-license: ${{ inputs.run-license }}
-        compatible-licenses-conf-path: ${{ inputs.compatible-licenses-conf-path }}
-        run-test: ${{ inputs.run-test }}
-        run-coverage: ${{ inputs.run-coverage }}
-        create-coverage-badge: ${{ inputs.test-create-coverage-badge }}
+    - name: Run Analyze
+      if: ${{ inputs.run-analyze == 'true' }}
+      env:
+        ANALYZE_FAILS_IF_INFOS: ${{ inputs.analyze-fails-if-infos }}
+        ANALYZE_FAILS_IF_WARNINGS: ${{ inputs.analyze-fails-if-warnings }}
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/check/analyze/analyze.sh
+        $GITHUB_ACTION_PATH/check/analyze/analyze.sh
+      
+    - name: Check Licenses
+      if: ${{ inputs.run-license == 'true' }}
+      env:
+        COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.compatible-licenses-conf-path }}
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/check/license/license.sh
+        $GITHUB_ACTION_PATH/check/license/license.sh
+    
+    - name: Run Tests
+      if: ${{ inputs.run-test == 'true' }}
+      env:
+        DART_DEFINE: ${{ inputs.dart-define }}
+        DART_DEFINE_FROM_FILE: ${{ inputs.dart-define-from-file }}
+        FLAVOR: ${{ inputs.flavor }}
+        CONCURRENCY: ${{ inputs.concurrency }}
+        TIMEOUT: ${{ inputs.timeout }}
+        IGNORE_TIMEOUTS: ${{ inputs.ignore-timeouts }}
+        RUN_COVERAGE: ${{ inputs.run-coverage }}
+        CREATE_COVERAGE_BADGE: ${{ inputs.create-coverage-badge }}
+        NO_PUB: ${{ inputs.no-pub }}
+        COVERAGE_BADGE_OUTPUT_PATH: ${{ inputs.coverage-badge-output-path }} ### -------------
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/check/test/test.sh
+        $GITHUB_ACTION_PATH/check/test/test.sh
 
     # -- Build --------------------------------------------------------------
     - name: Build android
       if: contains(inputs.build-platform, 'android')
-      uses: Spaccesi/flutter-actions-suite/build/android@main
-      with:
-        android-store-file-base64: ${{ inputs.android-store-file-base64 }}
-        android-local-properties-file: ${{ inputs.android-local-properties-file }}
-        android-key-alias: ${{ inputs.android-keystore-alias }}
-        android-store-password: ${{ inputs.android-keystore-password }}
-        android-key-password: ${{ inputs.android-key-password }}
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        flavor: ${{ inputs.flavor }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: ${{ inputs.no-pub }}
-        target: ${{ inputs.target }}
-        obfuscate: ${{ inputs.obfuscate }}
-        build-type: ${{ inputs.android-build-type }}
+      env:
+        ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
+        ANDROID_STORE_PASSWORD: ${{ inputs.android-store-password }}
+        ANDROID_KEY_PASSWORD: ${{ inputs.android-key-password }}
+        ANDROID_KEY_ALIAS: ${{ inputs.android-key-alias }}
+        FLAVOR: ${{ inputs.flavor }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        BUILD_TYPE: ${{ inputs.android-build-type }}
+        BUILD_MODE: ${{ inputs.build-mode }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/android/android.sh
+        $GITHUB_ACTION_PATH/build/android/android.sh
 
     - name: Build iOS
       if: contains(inputs.build-platform, 'ios')
-      uses: Spaccesi/flutter-actions-suite/build/ios@main
-      with:
-        ios-distribution-certificate-base64: ${{ inputs.ios-distribution-certificate-base64 }}
-        ios-distribution-certificate-password: ${{ inputs.ios-distribution-certificate-password }}
-        ios-provisioning-profile-base64: ${{ inputs.ios-provisioning-profile-base64 }}
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        flavor: ${{ inputs.flavor }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: 'true'
-        target: ${{ inputs.target }}
-        code-sign: ${{ inputs.code-sign }}
-        obfuscate: ${{ inputs.obfuscate }}
+      env:
+        IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.ios-distribution-certificate-base64 }}
+        IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ inputs.ios-distribution-certificate-password }}
+        IOS_PROVISIONING_PROFILE_BASE64: ${{ inputs.ios-provisioning-profile-base64 }}
+        BUILD_MODE: ${{ inputs.build-mode }}
+        FLAVOR: ${{ inputs.flavor }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/ios/ios.sh
+        $GITHUB_ACTION_PATH/build/ios/ios.sh
 
     - name: Build web
       if: contains(inputs.build-platform, 'web')
-      uses: Spaccesi/flutter-actions-suite/build/web@main
-      with:
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: 'true'
-        target: ${{ inputs.target }}
-        wasm: ${{ inputs.wasm }}
-        static-assets-url: ${{ inputs.static-assets-url }}
-        base-href: ${{ inputs.base-href }}
+      env:
+        BUILD_MODE: ${{ inputs.build-mode }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        BASE_HREF: ${{ inputs.base-href }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/web/web.sh
+        $GITHUB_ACTION_PATH/build/web/web.sh
 
     - name: Build windows
       if: contains(inputs.build-platform, 'windows')
-      uses: Spaccesi/flutter-actions-suite/build/windows@main
-      with:
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: 'true'
-        target: ${{ inputs.target }}
-        obfuscate: ${{ inputs.obfuscate }}
+      env:
+        BUILD_MODE: ${{ inputs.build-mode }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/windows/windows.sh
+        $GITHUB_ACTION_PATH/build/windows/windows.sh
 
     - name: Build macos
       if: contains(inputs.build-platform, 'macos')
-      uses: Spaccesi/flutter-actions-suite/build/macos@main
-      with:
-        macos-distribution-certificate-base64: ${{ inputs.macos-distribution-certificate-base64 }}
-        macos-distribution-certificate-password: ${{ inputs.macos-distribution-certificate-password }}
-        macos-installer-certificate-base64: ${{ inputs.macos-installer-certificate-base64 }}
-        macos-installer-certificate-password: ${{ inputs.macos-installer-certificate-password }}
-        macos-provisioning-profile-base64: ${{ inputs.macos-provisioning-profile-base64 }}
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        flavor: ${{ inputs.flavor }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: 'true'
-        target: ${{ inputs.target }}
-        obfuscate: ${{ inputs.obfuscate }}
+      env:
+        MACOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.macos-distribution-certificate-base64 }}
+        MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ inputs.macos-distribution-certificate-password }}
+        MACOS_INSTALLER_CERTIFICATE_BASE64: ${{ inputs.macos-installer-certificate-base64 }}
+        MACOS_INSTALLER_CERTIFICATE_PASSWORD: ${{ inputs.macos-installer-certificate-password }}
+        MACOS_PROVISIONING_PROFILE_BASE64: ${{ inputs.macos-provisioning-profile-base64 }}
+        BUILD_MODE: ${{ inputs.build-mode }}
+        FLAVOR: ${{ inputs.flavor }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/macos/macos.sh
+        $GITHUB_ACTION_PATH/build/macos/macos.sh
 
     - name: Build linux
       if: contains(inputs.build-platform, 'linux')
-      uses: Spaccesi/flutter-actions-suite/build/linux@main
-      with:
-        build-mode: ${{ inputs.build-mode }}
-        build-name: ${{ inputs.build-name }}
-        build-number: ${{ inputs.build-number }}
-        dart-define: ${{ inputs.dart-define }}
-        no-pub: 'true'
-        obfuscate: ${{ inputs.obfuscate }}
+      env:
+        BUILD_MODE: ${{ inputs.build-mode }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/linux/linux.sh
+        $GITHUB_ACTION_PATH/build/linux/linux.sh
 
     # -- Resolve build output path -------------------------------------------------
     - name: Resolve build output path
@@ -491,7 +525,7 @@ runs:
       with:
         android-package-name: ${{ inputs.play-store-package-name }}
         android-track: ${{ inputs.play-store-track }}
-        android-service-account-json-base64: ${{ inputs.play-store-service-account-json-base64 }}
+        android-service-account-json-base64: ${{ inputs.android-service-account-json-base64 }}
         android-release-files: ${{ env.FLUTTER_BUILD_OUTPUT }}
 
     - name: Deploy to ios App Store

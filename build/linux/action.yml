@@ -61,8 +61,8 @@ runs:
   using: 'composite'
   steps:
     - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/linux.sh
       shell: bash
+      run: chmod +x $GITHUB_ACTION_PATH/linux.sh
 
     - name: Build Linux app
       env:
@@ -79,5 +79,5 @@ runs:
         CODE_SIZE_DIRECTORY: ${{ inputs.code-size-directory }}
         TARGET_PLATFORM: ${{ inputs.target-platform }}
         TARGET_SYSROOT: ${{ inputs.target-sysroot }}
-      run: $GITHUB_ACTION_PATH/linux.sh
       shell: bash
+      run: $GITHUB_ACTION_PATH/linux.sh

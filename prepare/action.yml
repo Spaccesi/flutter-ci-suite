@@ -18,17 +18,23 @@ runs:
   using: 'composite'
   steps:
     - name: Install dependencies
-      run: flutter pub get
       shell: bash
+      run: flutter pub get
 
     - name: Run Build Runner
-      if: ${{ inputs.run-build-runner == 'true' }}
+      if: ${{ inputs.run-build-runner == 'true' }}  
       shell: bash
-      run: $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+        $GITHUB_ACTION_PATH/build_runner/build_runner.sh
 
     - name: Run gen-l10n
       if: ${{ inputs.run-gen-l10n == 'true' }}
-      env: 
+      env:
         FAILS_IF_UNTRANSLATED: ${{ inputs.gen-l10n-fails-if-untranslated }}
-      run: gen-l10n/gen-l10n.sh
       shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/gen-l10n/gen-l10n.sh
+        $GITHUB_ACTION_PATH/gen-l10n/gen-l10n.sh
+      
+      

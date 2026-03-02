@@ -63,8 +63,8 @@ runs:
   using: 'composite'
   steps:
     - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/windows.sh
       shell: bash
+      run: chmod +x $GITHUB_ACTION_PATH/windows.sh
 
     - name: Build Windows app
       env:
@@ -82,5 +82,5 @@ runs:
         TRACK_WIDGET_CREATION: ${{ inputs.track-widget-creation }}
         CONFIG_ONLY: ${{ inputs.config-only }}
         CODE_SIZE_DIRECTORY: ${{ inputs.code-size-directory }}
-      run: $GITHUB_ACTION_PATH/windows.sh
       shell: bash
+      run: $GITHUB_ACTION_PATH/windows.sh

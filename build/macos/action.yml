@@ -60,8 +60,8 @@ runs:
   using: 'composite'
   steps:
     - name: Add permissions
-      run: chmod +x $GITHUB_ACTION_PATH/macos.sh
       shell: bash
+      run: chmod +x $GITHUB_ACTION_PATH/macos.sh
 
     - name: Build macOS app
       env:
@@ -79,5 +79,5 @@ runs:
         BUILD_NUMBER: ${{ inputs.build-number }}
         BUILD_NAME: ${{ inputs.build-name }}
         CODE_SIGN: ${{ inputs.code-sign }}
-      run: $GITHUB_ACTION_PATH/macos.sh
       shell: bash
+      run: $GITHUB_ACTION_PATH/macos.sh
