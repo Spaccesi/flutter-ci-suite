@@ -18,7 +18,7 @@ runs:
   steps:
     - name: Check licenses
       env:
-        COMPATIBLE_LECENSES_CONF_PATH: ${{ inputs.compatible-licenses-conf-path }}
+        COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.compatible-licenses-conf-path }}
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/license.sh

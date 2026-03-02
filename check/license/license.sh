@@ -6,7 +6,7 @@ fi
 echo "☑️ license_checker available"
 
 echo "▶️ Running license check"
-OUTPUT=$(lic_ck check-licenses -c $COMPATIBLE_LECENSES_CONF_PATH -i -a)
+OUTPUT=$(lic_ck check-licenses -i -a -c $COMPATIBLE_LICENSES_CONF_PATH)
 
 if ! echo "$OUTPUT" | grep -q "No package licenses need approval!"; then
   echo "::error::🚨 Found incompatible licenses."
