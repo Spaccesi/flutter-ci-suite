@@ -1,15 +1,8 @@
 name: Publish Flutter iOS app to App Store
 description: |
-  Publish the built Flutter iOS app to the App Store using the 
-  App Store Connect API. This action assumes that you have already 
+  Publish the built Flutter iOS app to the App Store using the
+  App Store Connect API. This action assumes that you have already
   built the iOS app and generated an .ipa file in a previous step.
-
-  The action requires the following inputs:
-  - app-store-connect-key: A base64 encoded App Store Connect API key file (JSON format).
-  - app-id: The App Store Connect app ID (e.g. 1234567890).
-  - app-version: The version of the app to publish (e.g. 1.0.0).
-  - release-notes: Release notes for this version (optional).
-  - release-notes-file: Path to a file containing release notes for this version (optional).
 
 inputs:
   apple-api-key-id:
@@ -19,48 +12,30 @@ inputs:
     description: 'Apple API key issuer ID. Required for publishing to App Store Connect.'
     required: true
   apple-api-key-content:
-    description: 'Apple API key content. Required for publishing to App Store Connect.'
+    description: 'Apple API key content (.p8 file, base64 encoded). Required for publishing to App Store Connect.'
     required: true
-  apple-app-id:
-    description: 'App Store Connect app ID (e.g. 1234567890)'
-    required: true
-  app-version:
-    description: 'Version of the app to publish (e.g. 1.0.0)'
-    required: true
-  release-notes:
-    description: 'Release notes for this version (optional)'
+  ios-app-path:
+    description: 'Path to the iOS .ipa file'
     required: false
-  release-notes-file:
-    description: 'Path to a file containing release notes for this version (optional)'
-    required: false
+    default: 'build/ios/ipa/*.ipa'
 
 runs:
   using: 'composite'
   steps:
-    - name: Install certificates (if needed)
-      shell: bash
-      env:
-        APP_STORE_CONNECT_KEY: ${{ inputs.app-store-connect-key }}
-      run: |
-        # Create temporary directory for the API key
-        mkdir -p $RUNNER_TEMP/app_store_connect_key
-
-        # Decode the base64 encoded API key and save it to a file
-        echo "$APP_STORE_CONNECT_KEY" | base64 --decode > $RUNNER_TEMP/app_store_connect_key/key.json
-
-        # Set environment variable for the API key file path
-        echo "APP_STORE_CONNECT_KEY_PATH=$RUNNER_TEMP/app_store_connect_key/key.json" >> $GITHUB_ENV
-
     - name: Publish to App Store Connect
       shell: bash
       env:
         API_KEY_ID: ${{ inputs.apple-api-key-id }}
         API_ISSUER_ID: ${{ inputs.apple-api-key-issuer-id }}
         API_KEY_CONTENT: ${{ inputs.apple-api-key-content }}
+        IOS_APP_PATH: ${{ inputs.ios-app-path }}
       run: |
         # Create private key file
         mkdir -p ~/.appstoreconnect/private_keys
         echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_$API_KEY_ID.p8
-        
+
+        # Resolve glob to actual file path
+        IPA_FILE=$(ls $IOS_APP_PATH | head -1)
+
         # Upload
-        xcrun altool --upload-app --type ios --file build/ios/ipa/*.ipa --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
+        xcrun altool --upload-app --type ios --file "$IPA_FILE" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"

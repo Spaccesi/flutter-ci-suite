@@ -13,7 +13,7 @@ inputs:
   android-release-files:
     description: 'The release files to publish to the Play Store (e.g. build/app/outputs/bundle/release/app-release.aab)'
     required: false
-    default: 'build/app/outputs/bundle/release/app-release.aab'
+    default: 'build/app/outputs/bundle/**/*.aab'
 runs:
   using: 'composite'
   steps:
