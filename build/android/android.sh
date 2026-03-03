@@ -1,3 +1,5 @@
+set -e
+
 if [ "$BUILD_MODE" != 'debug' ]; then
   echo "▶️ Decoding keystore"
   KEYSTORE_PATH="android/upload-keystore.jks"

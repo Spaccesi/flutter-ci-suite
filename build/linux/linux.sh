@@ -1,3 +1,5 @@
+set -e
+
 if ! dpkg -l libgtk-3-dev &> /dev/null; then
   echo "::group::ℹ️ Installing Linux build dependencies"
   sudo apt-get update && sudo apt-get install -y libgtk-3-dev

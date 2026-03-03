@@ -1,3 +1,5 @@
+set -e
+
 FLAGS="--$BUILD_MODE"
 [ "$BUILD_NAME" != '' ] && FLAGS="$FLAGS --build-name=$BUILD_NAME"
 [ "$BUILD_NUMBER" != '' ] && FLAGS="$FLAGS --build-number=$BUILD_NUMBER"

@@ -1,3 +1,5 @@
+set -e
+
 FLAGS="--$BUILD_MODE"
 [ "$DART_DEFINE" != '' ] && FLAGS="$FLAGS --dart-define=$DART_DEFINE"
 [ "$BUILD_NUMBER" != '' ] && FLAGS="$FLAGS --build-number=$BUILD_NUMBER"
