@@ -28,7 +28,7 @@ runs:
         API_KEY_ID: ${{ inputs.apple-api-key-id }}
         API_ISSUER_ID: ${{ inputs.apple-api-key-issuer-id }}
         API_KEY_CONTENT: ${{ inputs.apple-api-key-content }}
-        IOS_APP_PATH: ${{ inputs.ios-app-path }}
+        APP_PATH: ${{ inputs.ios-app-path }}
       run: |
         # Create private key file
         mkdir -p ~/.appstoreconnect/private_keys
