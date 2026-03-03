@@ -35,7 +35,12 @@ runs:
         echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_$API_KEY_ID.p8
 
         # Resolve glob to actual file path
-        IPA_FILE=$(ls $IOS_APP_PATH | head -1)
+        IPA_FILE=$(ls $IOS_APP_PATH 2>/dev/null | head -1)
+
+        if [ -z "$IPA_FILE" ]; then
+          echo "Error: No .ipa file found at '$IOS_APP_PATH'. Make sure the iOS build step ran successfully before this action."
+          exit 1
+        fi
 
         # Upload
         xcrun altool --upload-app --type ios --file "$IPA_FILE" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
