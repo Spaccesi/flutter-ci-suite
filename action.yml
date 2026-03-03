@@ -482,7 +482,7 @@ runs:
 
     - name: Upload artifact
       if: contains(inputs.publish-destination, 'github-artifact') || contains(inputs.publish-destination, 'github-pages')
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: ${{ env.FLUTTER_BUILD_OUTPUT }}
 
