@@ -171,8 +171,8 @@ inputs:
   android-local-properties-file:
     description: 'Path to a local.properties file containing the path to the Android SDK. This is required if the Android SDK is not available in the default location on the runner.'
     required: false
-  android-service-account-json-base64:
-    description: 'Base64 encoded JSON key file for the Google Play Store service account. Required for publishing to Google Play Store.'
+  android-service-account-json:
+    description: 'JSON file content for the Google Play Store service account. Required for publishing to Google Play Store.'
     required: false
   play-store-track:
     description: 'The track to publish the app to (e.g. alpha, beta, production)'
@@ -535,7 +535,7 @@ runs:
       with:
         android-package-name: ${{ inputs.play-store-package-name }}
         android-track: ${{ inputs.play-store-track }}
-        android-service-account-json-base64: ${{ inputs.android-service-account-json-base64 }}
+        android-service-account-json: ${{ inputs.android-service-account-json }}
         android-release-files: ${{ env.FLUTTER_BUILD_OUTPUT }}
 
     - name: Deploy to ios App Store
