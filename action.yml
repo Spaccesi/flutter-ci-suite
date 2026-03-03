@@ -174,6 +174,9 @@ inputs:
   android-service-account-json-base64:
     description: 'Base64 encoded JSON key file for the Google Play Store service account. Required for publishing to Google Play Store.'
     required: false
+  play-store-track:
+    description: 'The track to publish the app to (e.g. alpha, beta, production)'
+    required: false
 
   # Windows Build step inputs
   microsoft-partner-center-tenant-id:
@@ -286,6 +289,11 @@ runs:
         cache: true
 
     # -- Prepare -----------------------------------------------------
+    - name: Get dependencies
+      shell: bash
+      run:
+        flutter pub get
+
     - name: Run Build Runner
       shell: bash
       if: ${{ inputs.run-build-runner != 'false' }}
@@ -438,7 +446,7 @@ runs:
     # -- Resolve build output path -------------------------------------------------
     - name: Resolve build output path
       id: resolve-output
-      shell: bash
+      shell: bash      
       run: |
         PLATFORM="${{ inputs.build-platform }}"
         MODE="${{ inputs.build-mode }}"
@@ -472,17 +480,17 @@ runs:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
 
-    - name: Setup Pages
-      if: contains(inputs.publish-destination, 'github-pages') && contains(inputs.build-platform, 'web')
-      uses: actions/configure-pages@v4
-      with:
-        enablement: true
-
     - name: Upload artifact
       if: contains(inputs.publish-destination, 'github-artifact') || contains(inputs.publish-destination, 'github-pages')
       uses: actions/upload-pages-artifact@v3
       with:
         path: ${{ env.FLUTTER_BUILD_OUTPUT }}
+
+    - name: Setup Pages
+      if: contains(inputs.publish-destination, 'github-pages') && contains(inputs.build-platform, 'web')
+      uses: actions/configure-pages@v4
+      with:
+        enablement: true
 
     - name: Deploy to GitHub Pages
       if: contains(inputs.publish-destination, 'github-pages') && contains(inputs.build-platform, 'web')
@@ -494,7 +502,7 @@ runs:
       if: contains(inputs.publish-destination, 'firebase-app-distribution') && contains(inputs.build-platform, 'ios')
       uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
       with:
-        firebase-release-binary-file: ${{ env.FLUTTER_BUILD_OUTPUT }}
+        firebase-release-binary-file: 'build/ios/*.ipa'
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-app-id: ${{ inputs.firebase-app-id }}
         firebase-groups: ${{ inputs.firebase-groups }}
@@ -535,8 +543,6 @@ runs:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
         apple-api-key-content: ${{ inputs.apple-api-key-content }}
         apple-api-key-issuer-id: ${{ inputs.apple-api-key-issuer-id }}
-        apple-app-id: ${{ inputs.apple-app-id }}
-        app-version: ${{ inputs.app-store-app-version }}
 
     - name: Deploy to Microsoft Store
       if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'windows')
@@ -555,7 +561,6 @@ runs:
         apple-api-key-id: ${{ inputs.macos-app-store-apple-id }}
         apple-api-key-issuer-id: ${{ inputs.macos-app-store-apple-issuer-id }}
         apple-api-key-content: ${{ inputs.macos-app-store-apple-key-content }}
-        macos-provisioning-profile-base64: ${{ inputs.macos-app-store-macos-provisioning-profile-base64 }}
 
     - name: Deploy to Linux App Store
       if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'linux')
