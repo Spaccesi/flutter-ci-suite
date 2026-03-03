@@ -27,7 +27,6 @@ runs:
     - name: Publish to Play Store
       uses: r0adkll/upload-google-play@v1
       with:
-        serviceAccountJsonPlainText: ${{ inputs.android-service-account-json-base64 }}
         packageName: ${{ inputs.android-package-name }}
         releaseFiles: ${{ inputs.android-release-files }}
         track: ${{ inputs.android-track }}
