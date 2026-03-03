@@ -316,6 +316,7 @@ runs:
       env:
         ANALYZE_FAILS_IF_INFOS: ${{ inputs.analyze-fails-if-infos }}
         ANALYZE_FAILS_IF_WARNINGS: ${{ inputs.analyze-fails-if-warnings }}
+        NO_PUB: 'true'
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/check/analyze/analyze.sh
@@ -341,7 +342,7 @@ runs:
         IGNORE_TIMEOUTS: ${{ inputs.ignore-timeouts }}
         RUN_COVERAGE: ${{ inputs.run-coverage }}
         CREATE_COVERAGE_BADGE: ${{ inputs.create-coverage-badge }}
-        NO_PUB: ${{ inputs.no-pub }}
+        NO_PUB: 'true'
         COVERAGE_BADGE_OUTPUT_PATH: ${{ inputs.coverage-badge-output-path }} ### -------------
       shell: bash
       run: |
@@ -362,6 +363,7 @@ runs:
         BUILD_MODE: ${{ inputs.build-mode }}
         BUILD_NAME: ${{ inputs.build-name }}
         BUILD_NUMBER: ${{ inputs.build-number }}
+        NO_PUB: 'true'
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/build/android/android.sh
