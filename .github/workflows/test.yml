@@ -16,7 +16,7 @@ name: Test Actions
 
 on:
   push:
-    branches: [main, feature/*]
+    branches: [feature/*]
   pull_request:
 
 jobs:
