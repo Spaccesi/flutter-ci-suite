@@ -1,33 +1,54 @@
 set -e
 
 if [ "$CODE_SIGN" != 'false' ]; then
+  echo "▶️ Installing distribution certificate"
   KEYCHAIN_PASSWORD='dist_password'
   KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-  echo "▶️ Installing distribution certificate"
+  # import certificate and provisioning profile from secrets
   CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
   echo -n "$MACOS_DISTRIBUTION_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+  # create temporary keychain
   security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
   security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
   security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+  # import certificate to keychain
   security import $CERTIFICATE_PATH -P "$MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
   security list-keychain -d user -s $KEYCHAIN_PATH
+
   echo "✅ Distribution certificate installed."
 
+  # -- Installing Installer certificate ------------------------------------------------------------------
   echo "▶️ Installing installer certificate"
+
   INSTALLER_CERTIFICATE_PATH=$RUNNER_TEMP/build_installer_certificate.p12
+
+  # import certificate from secrets
   echo -n "$MACOS_INSTALLER_CERTIFICATE_BASE64" | base64 --decode -o $INSTALLER_CERTIFICATE_PATH
+
+  # import certificate to keychain
+  # Using -T /usr/bin/codesign to explicitly allow usage
   security import $INSTALLER_CERTIFICATE_PATH -P "$MACOS_INSTALLER_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -t cert -f pkcs12 -k $KEYCHAIN_PATH
   echo "✅ Installer certificate installed."
 
+  # -- Installing provisioning profile ------------------------------------------------------------------
   echo "▶️ Installing provisioning profile"
+
   PP_PATH=$RUNNER_TEMP/build_pp.provisionprofile
+
+  # import provisioning profile from secrets
   echo -n "$MACOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+  # apply provisioning profile
   mkdir -p ~/Library/ProvisioningProfiles
   cp $PP_PATH ~/Library/ProvisioningProfiles
+
+  # Extract UUID and copy with UUID name to ensure detection
   UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i $PP_PATH))
   cp $PP_PATH ~/Library/ProvisioningProfiles/$UUID.provisionprofile
-  echo "profile_uuid=$UUID" >> $GITHUB_ENV
+
   echo "✅ Provisioning profile installed (UUID: $UUID)."
 fi
 
