@@ -17,9 +17,14 @@ if [ "$CODE_SIGN" == 'true' ]; then
   echo "▶️ Installing provisioning profile"
   PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
   echo -n "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+  UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i $PP_PATH))
   mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-  cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-  echo "✅ Provisioning profile installed."
+  cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+  echo "✅ Provisioning profile installed (UUID: $UUID)."
+
+  echo "▶️ Disabling automatic code signing"
+  sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+  echo "✅ Manual code signing enabled."
 fi
 
 FLAGS="--$BUILD_MODE"
@@ -31,7 +36,7 @@ FLAGS="--$BUILD_MODE"
 [ "$EXPORT_METHOD" != '' ] && FLAGS="$FLAGS --export-method $EXPORT_METHOD"
 [ "$EXPORT_OPTIONS_PLIST" != '' ] && FLAGS="$FLAGS --export-options-plist=$EXPORT_OPTIONS_PLIST"
 [ "$NO_PUB" == 'true' ] && FLAGS="$FLAGS --no-pub"
-[ "$OBFUSCATE" != 'true' ] && FLAGS="$FLAGS --no-obfuscate"
+[ "$NO_OBFUSCATE" == 'true' ] && FLAGS="$FLAGS --no-obfuscate"
 [ "$CODE_SIGN" == 'false' ] && FLAGS="$FLAGS --no-codesign"
 
 echo "▶️ Running flutter build ipa with flags: $FLAGS"
