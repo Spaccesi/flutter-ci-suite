@@ -1,6 +1,6 @@
 set -e
 
-if [ "$CODE_SIGN" == 'true' ]; then
+if [ "$CODE_SIGN" != 'false' ]; then
   KEYCHAIN_PASSWORD='dist_password'
   KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 

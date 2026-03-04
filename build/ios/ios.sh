@@ -1,6 +1,6 @@
 set -e
 
-if [ "$CODE_SIGN" == 'true' ]; then
+if [ "$CODE_SIGN" != 'false' ]; then
   KEYCHAIN_PASSWORD='dist_password'
   KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
@@ -24,7 +24,8 @@ if [ "$CODE_SIGN" == 'true' ]; then
 
   echo "▶️ Disabling automatic code signing"
   sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
-  echo "✅ Manual code signing enabled."
+  sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$UUID\";/g" ios/Runner.xcodeproj/project.pbxproj
+  echo "✅ Manual code signing enabled (profile: $UUID)."
 fi
 
 FLAGS="--$BUILD_MODE"
