@@ -28,7 +28,7 @@ inputs:
   dart-define-from-file:
     description: 'Path to a file containing Dart define variables for the Flutter build (optional)'
     required: false
-  obfuscate:
+  no-obfuscate:
     description: 'Whether to obfuscate the Dart code in release builds (default: false).'
     required: false
     default: 'false'
@@ -71,7 +71,7 @@ runs:
         BUILD_NUMBER: ${{ inputs.build-number }}
         DART_DEFINE: ${{ inputs.dart-define }}
         DART_DEFINE_FROM_FILE: ${{ inputs.dart-define-from-file }}
-        OBFUSCATE: ${{ inputs.obfuscate }}
+        NO_OBFUSCATE: ${{ inputs.no-obfuscate }}
         NO_PUB: ${{ inputs.no-pub }}
         SPLIT_DEBUG_INFO: ${{ inputs.split-debug-info }}
         NO_TREE_SHAKE_ICONS: ${{ inputs.no-tree-shake-icons }}

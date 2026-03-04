@@ -35,9 +35,10 @@ inputs:
   dart-define:
     description: 'Dart define variables for the Flutter build (optional, format: KEY=VALUE)'
     required: false
-  obfuscate:
+  no-obfuscate:
     description: 'Whether to obfuscate the Dart code in release builds (default: false)'
     required: false
+    default: 'false'
   no-pub:
     description: "Whether to skip running 'flutter pub get' before the build (default: false)"
     required: false
@@ -73,7 +74,7 @@ runs:
         BUILD_MODE: ${{ inputs.build-mode }}
         FLAVOR: ${{ inputs.flavor }}
         DART_DEFINE: ${{ inputs.dart-define }}
-        OBFUSCATE: ${{ inputs.obfuscate }}
+        NO_OBFUSCATE: ${{ inputs.no-obfuscate }}
         NO_PUB: ${{ inputs.no-pub }}
         TARGET: ${{ inputs.target }}
         BUILD_NUMBER: ${{ inputs.build-number }}

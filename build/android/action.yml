@@ -53,9 +53,10 @@ inputs:
   target:
     description: 'Target file for the build (optional)'
     required: false
-  obfuscate:
+  no-obfuscate:
     description: 'Whether to obfuscate the build'
     required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -75,7 +76,7 @@ runs:
         BUILD_NUMBER: ${{ inputs.build-number }}
         NO_PUB: ${{ inputs.no-pub }}
         TARGET: ${{ inputs.target }}
-        OBFUSCATE: ${{ inputs.obfuscate }}
+        NO_OBFUSCATE: ${{ inputs.no-obfuscate }}
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/android.sh

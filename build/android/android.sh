@@ -19,7 +19,7 @@ FLAGS="--$BUILD_MODE"
 [ "$TARGET" != '' ] && FLAGS="$FLAGS -t $TARGET"
 [ "$NO_PUB" == 'true' ] && FLAGS="$FLAGS --no-pub"
 [ "$FLAVOR" != '' ] && FLAGS="$FLAGS --flavor=$FLAVOR"
-[ "$OBFUSCATE" == 'false' ] && FLAGS="$FLAGS --no-obfuscate"
+[ "$NO_OBFUSCATE" == 'true' ] && FLAGS="$FLAGS --no-obfuscate"
 
 echo "▶️ Running flutter build $BUILD_TYPE with flags: $FLAGS"
 flutter build "$BUILD_TYPE" $FLAGS

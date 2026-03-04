@@ -23,10 +23,10 @@ inputs:
     description: 'Whether to skip running "flutter pub get" before building the app.'
     required: false
     default: 'false'
-  obfuscate:
+  no-obfuscate:
     description: 'Whether to obfuscate the Dart code in a release build.'
     required: false
-    default: 'true'
+    default: 'false'
   split-debug-info:
     description: 'Directory to store Dart program symbol files for symbolizing stack traces.'
     required: false
