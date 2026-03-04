@@ -490,7 +490,7 @@ runs:
 
     - name: Setup Pages
       if: contains(inputs.publish-destination, 'github-pages') && contains(inputs.build-platform, 'web')
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
       with:
         enablement: true
 
