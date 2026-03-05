@@ -20,8 +20,9 @@ inputs:
     default: 'build/ios/ipa/*.ipa'
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
+
     - name: Publish to App Store Connect
       shell: bash
       env:
@@ -30,9 +31,5 @@ runs:
         API_KEY_CONTENT: ${{ inputs.apple-api-key-content }}
         APP_PATH: ${{ inputs.ios-app-path }}
       run: |
-        # Create private key file
-        mkdir -p ~/.appstoreconnect/private_keys
-        echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_$API_KEY_ID.p8
-
-        # Upload
-        xcrun altool --upload-app --type ios --file "$APP_PATH" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
+        chmod +x ${{ github.action_path }}/ios-app-store.sh
+        bash ${{ github.action_path }}/ios-app-store.sh

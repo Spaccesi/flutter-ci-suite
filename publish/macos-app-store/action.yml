@@ -1,5 +1,6 @@
 name: Publish macOS App Store
-description: Publish the macOS app to the App Store using Flutter
+description: Publish the macOS app to the App Store using the App Store Connect API.
+
 inputs:
   apple-api-key-id:
     description: 'Apple API key ID (e.g developer@apple.com)'
@@ -11,12 +12,12 @@ inputs:
     description: 'Base64 encoded content of the Apple API private key (.p8 file)'
     required: true
   macos-app-path:
-    description: 'Path to the macOS app'
+    description: 'Path to the macOS .pkg file'
     required: false
     default: 'build/macos/pkg/*.pkg'
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Upload app to App Store Connect
       shell: bash
@@ -26,13 +27,5 @@ runs:
         API_KEY_CONTENT: ${{ inputs.apple-api-key-content }}
         MACOS_APP_PATH: ${{ inputs.macos-app-path }}
       run: |
-        # Create private key file
-        mkdir -p ~/.appstoreconnect/private_keys
-        echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_$API_KEY_ID.p8
-
-        # Resolve glob to actual file path
-        PKG_FILE=$(ls $MACOS_APP_PATH | head -1)
-
-        # Upload
-        # Note: altool uses --type osx for macOS apps
-        xcrun altool --upload-app --type osx --file "$PKG_FILE" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
+        chmod +x ${{ github.action_path }}/macos-app-store.sh
+        bash ${{ github.action_path }}/macos-app-store.sh

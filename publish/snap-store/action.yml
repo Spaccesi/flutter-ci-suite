@@ -1,42 +1,21 @@
 name: Publish Flutter app to Snap Store
 description: Publish the built Flutter app to the Snap Store
+
 inputs:
   snap-store-token:
     description: 'Snap Store API token with permissions to publish snaps'
     required: true
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
-    - name: Install Snapcraft
-      shell: bash
-      run: sudo snap install snapcraft --classic
-
-    - name: Install core24 snap
-      shell: bash
-      run: sudo snap install core24 --channel=latest/stable
-
     - name: Setup LXD (for managed builds)
-      uses: canonical/setup-lxd@main
-
-    - name: Extract Flutter version
-      shell: bash
-      id: flutter_version
-      run: |
-        VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //;s/+.*//')
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-    - name: Update snapcraft.yaml version
-      shell: bash
-      run: |
-        sed -i "s/^version: .*/version: \"$VERSION\"/" snap/snapcraft.yaml
-
-    - name: Build snap
-      shell: bash
-      run: snapcraft pack --debug --use-lxd
+      uses: canonical/setup-lxd@v0.1.2
 
     - name: Publish to Snap Store
       shell: bash
-      run: snapcraft upload *.snap --release=stable
       env:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ inputs.snap-store-token }}
+      run: |
+        chmod +x ${{ github.action_path }}/snap-store.sh
+        bash ${{ github.action_path }}/snap-store.sh
