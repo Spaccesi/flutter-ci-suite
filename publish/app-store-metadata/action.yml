@@ -1,0 +1,38 @@
+name: Publish App Store Metadata
+description: |
+  Upload app metadata (name, subtitle, description, keywords, release notes, URLs)
+  to App Store Connect via the REST API. Reads one YAML file per locale from a
+  metadata folder and pushes each field to the matching App Store localization.
+  Supports both iOS (IOS) and macOS (MAC_OS) apps.
+
+inputs:
+  apple-api-key-id:
+    description: 'App Store Connect API key ID'
+    required: true
+  apple-api-key-issuer-id:
+    description: 'App Store Connect API key issuer ID (UUID format)'
+    required: true
+  apple-api-key-content:
+    description: 'Base64-encoded content of the App Store Connect API private key (.p8 file)'
+    required: true
+  app-id:
+    description: 'App Store Connect numeric app ID'
+    required: true
+
+  platform:
+    description: 'Target platform: IOS or MAC_OS'
+    default: 'IOS'
+  metadata-path:
+    description: 'Path to the folder containing per-locale YAML metadata files (e.g. en-US.yaml)'
+    default: 'ios/metadata'
+  version-string:
+    description: 'App version string to attach metadata to (e.g. 1.2.0). If omitted, read from pubspec.yaml automatically.'
+    default: ''
+
+  submit-for-review:
+    description: 'Whether to submit the version for review after uploading metadata (default: false)'
+    default: 'false'
+
+runs:
+  using: node20
+  main: dist/index.js

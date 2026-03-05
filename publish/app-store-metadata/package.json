@@ -1,0 +1,21 @@
+{
+  "name": "app-store-metadata",
+  "version": "1.0.0",
+  "description": "Upload App Store Connect metadata from YAML locale files",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist --minify",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/http-client": "^2.2.3",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "@vercel/ncc": "^0.38.3",
+    "typescript": "^5.4.5"
+  }
+}
