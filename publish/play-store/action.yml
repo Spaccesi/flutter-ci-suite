@@ -14,6 +14,10 @@ inputs:
     description: 'The release files to publish to the Play Store (e.g. build/app/outputs/bundle/release/app-release.aab)'
     required: false
     default: 'build/app/outputs/bundle/**/*.aab'
+  android-status:
+    description: 'The status of the release (e.g. completed, draft, halted, inProgress)'
+    required: false
+    default: 'completed'
 runs:
   using: 'composite'
   steps:
@@ -24,3 +28,4 @@ runs:
         releaseFiles: ${{ inputs.android-release-files }}
         track: ${{ inputs.android-track }}
         serviceAccountJsonPlainText: ${{ inputs.android-service-account-json }}
+        status: ${{ inputs.android-status }}
