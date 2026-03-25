@@ -28,11 +28,13 @@ if [ "$CODE_SIGN" != 'false' ]; then
   PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
 
   # import provisioning profile from secrets
-  echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+  echo -n "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
 
   # apply provisioning profile
   mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
   cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+  echo "✅ Provisioning profile installed."
 fi
 
 FLAGS="--$BUILD_MODE"
