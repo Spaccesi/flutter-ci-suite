@@ -14,6 +14,6 @@ runs:
         FAILS_IF_UNTRANSLATED: ${{ inputs.gen-l10n-fails-if-untranslated }}
       shell: bash
       run: |
-        chmod +x $GITHUB_ACTION_PATH/build_runner/build_runner.sh
-        $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+        chmod +x $GITHUB_ACTION_PATH/gen-l10n/gen-l10n.sh
+        $GITHUB_ACTION_PATH/gen-l10n/gen-l10n.sh
       

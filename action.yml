@@ -298,8 +298,8 @@ runs:
       shell: bash
       if: ${{ inputs.run-build-runner != 'false' }}
       run: |
-        chmod +x $GITHUB_ACTION_PATH/build_runner/build_runner.sh
-        $GITHUB_ACTION_PATH/build_runner/build_runner.sh
+        chmod +x $GITHUB_ACTION_PATH/prepare/build_runner/build_runner.sh
+        $GITHUB_ACTION_PATH/prepare/build_runner/build_runner.sh
 
     - name: Run gen-l10n
       shell: bash
