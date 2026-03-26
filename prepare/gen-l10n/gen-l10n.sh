@@ -33,7 +33,7 @@ for PACKAGE_DIR in $PACKAGES; do
                 echo "untranslated-messages-file path not found, adding to $CONFIG_FILE"
                 # Add a newline just in case the file doesn't end with one
                 echo "" >> "$CONFIG_FILE"
-                echo "untranslated-messages-file: untranslated_messages.txt" >> "$CONFIG_FILE"
+                echo "untranslated-messages-file: untranslated_messages.json" >> "$CONFIG_FILE"
             fi
         fi
 
@@ -48,8 +48,8 @@ for PACKAGE_DIR in $PACKAGES; do
 
             if [ -n "$UNTRANSLATED_FILE" ]; then
                 if [ -f "$UNTRANSLATED_FILE" ]; then
-                    content=$(cat untranslated_messages.json)
-                    if [ -s "$UNTRANSLATED_FILE" && "$content" != "{}" ]; then
+                    content=$(cat "$UNTRANSLATED_FILE")
+                    if [ -s "$UNTRANSLATED_FILE" ] && [ "$content" != "{}" ]; then
                         echo "::error::🚨 Untranslated messages found in $PACKAGE_DIR/$UNTRANSLATED_FILE"
                         cat "$UNTRANSLATED_FILE"
                         HAS_ERROR=true

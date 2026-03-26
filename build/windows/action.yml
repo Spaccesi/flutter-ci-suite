@@ -78,7 +78,7 @@ runs:
         BUILD_NAME: ${{ inputs.build-name }}
         BUILD_NUMBER: ${{ inputs.build-number }}
         NO_PUB: ${{ inputs.no-pub }}
-        OBFUSCATE: ${{ inputs.obfuscate }}
+        NO_OBFUSCATE: ${{ inputs.no-obfuscate }}
         SPLIT_DEBUG_INFO: ${{ inputs.split-debug-info }}
         NO_TREE_SHAKE_ICONS: ${{ inputs.no-tree-shake-icons }}
         NO_ANALYZE_SIZE: ${{ inputs.no-analyze-size }}

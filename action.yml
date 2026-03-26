@@ -87,6 +87,9 @@ inputs:
   dart-define:
     description: 'Additional Dart define variables to pass to the Flutter build command. This should be a comma separated list of key=value pairs.'
     required: false
+  release-notes:
+    description: 'Release notes to include when publishing the app. This is used for platforms that support release notes, such as Firebase App Distribution and Google Play Store.'
+    required: false
 
   # Apple Publish step inputs
   apple-api-key-id:
@@ -145,6 +148,12 @@ inputs:
   firebase-project-id:
     description: 'Firebase project ID to publish to. Required for publishing to Firebase Hosting.'
     required: false
+  firebase-app-distribution-app-id:
+    description: 'Firebase App ID to publish to. Required for publishing to Firebase App Distribution.'
+    required: false
+  firebase-app-distribution-groups:
+    description: 'Comma separated list of tester groups to distribute the app to. Required for publishing to Firebase App Distribution.'
+    required: false
   firebase-hosting-target:
     description: 'Target to publish to. Required for publishing to Firebase Hosting.'
     required: false
@@ -179,6 +188,9 @@ inputs:
   # Windows Build step inputs
   microsoft-partner-center-tenant-id:
     description: 'Microsoft Partner Center tenant ID. Required for publishing to Microsoft Store.'
+    required: false
+  microsoft-store-app-id:
+    description: 'Microsoft Store app ID. Required for publishing to Microsoft Store.'
     required: false
   microsoft-partner-center-seller-id:
     description: 'Microsoft Partner Center seller ID. Required for publishing to Microsoft Store.'
@@ -345,12 +357,11 @@ runs:
       if: ${{ inputs.run-test == 'true' }}
       env:
         DART_DEFINE: ${{ inputs.dart-define }}
-        DART_DEFINE_FROM_FILE: ${{ inputs.dart-define-from-file }}
         FLAVOR: ${{ inputs.flavor }}
-        CONCURRENCY: ${{ inputs.concurrency }}
-        TIMEOUT: ${{ inputs.timeout }}
-        IGNORE_TIMEOUTS: ${{ inputs.ignore-timeouts }}
-        RUN_COVERAGE: ${{ inputs.run-coverage }}
+        CONCURRENCY: ${{ inputs.test-concurrency }}
+        TIMEOUT: ${{ inputs.test-timeout }}
+        IGNORE_TIMEOUTS: ${{ inputs.test-ignore-timeouts }}
+        RUN_COVERAGE: ${{ inputs.test-run-coverage }}
         CREATE_COVERAGE_REPORT: ${{ inputs.test-create-coverage-report }}
         NO_PUB: 'true'
       shell: bash
@@ -515,17 +526,27 @@ runs:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-app-id: ${{ inputs.firebase-app-id }}
         firebase-groups: ${{ inputs.firebase-groups }}
-        firebase-release-notes: ${{ inputs.firebase-release-notes }}
+        firebase-release-notes: ${{ inputs.release-notes }}
 
-    - name: Publish android to Firebase App Distribution
-      if: contains(inputs.publish-destination, 'firebase-app-distribution') && contains(inputs.build-platform, 'android')
+    - name: Publish android to Firebase App Distribution (APK)
+      if: contains(inputs.publish-destination, 'firebase-app-distribution') && contains(inputs.build-platform, 'android-apk')
       uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-release-binary-file: ${{ steps.build-android.outputs.artifact-path }}
         firebase-app-id: ${{ inputs.firebase-app-distribution-app-id }}
         firebase-groups: ${{ inputs.firebase-app-distribution-groups }}
-        firebase-release-notes: ${{ inputs.firebase-app-distribution-release-notes }}
+        firebase-release-notes: ${{ inputs.release-notes }}
+
+    - name: Publish android to Firebase App Distribution (App Bundle)
+      if: contains(inputs.publish-destination, 'firebase-app-distribution') && contains(inputs.build-platform, 'android-appbundle')
+      uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
+      with:
+        firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
+        firebase-release-binary-file: ${{ steps.build-android-appbundle.outputs.artifact-path }}
+        firebase-app-id: ${{ inputs.firebase-app-distribution-app-id }}
+        firebase-groups: ${{ inputs.firebase-app-distribution-groups }}
+        firebase-release-notes: ${{ inputs.release-notes }}
 
     - name: Publish to Firebase Hosting
       if: contains(inputs.publish-destination, 'firebase-hosting') && contains(inputs.build-platform, 'web')
@@ -579,10 +600,9 @@ runs:
       if: contains(inputs.publish-destination, 'macos-app-store') && contains(inputs.build-platform, 'macos')
       uses: Spaccesi/flutter-actions-suite/publish/macos-app-store@main
       with:
-        apple-api-key-id: ${{ inputs.macos-app-store-apple-id }}
-        apple-api-key-issuer-id: ${{ inputs.macos-app-store-apple-issuer-id }}
-        apple-api-key-content: ${{ inputs.macos-app-store-apple-key-content }}
-        macos-app-path: ${{ steps.build-macos.outputs.artifact-path }}
+        apple-api-key-id: ${{ inputs.apple-api-key-id }}
+        apple-api-key-issuer-id: ${{ inputs.apple-api-key-issuer-id }}
+        apple-api-key-content: ${{ inputs.apple-api-key-content }}
 
     - name: Deploy to Linux Snap App Store
       if: contains(inputs.publish-destination, 'snap-store') && contains(inputs.build-platform, 'linux')
