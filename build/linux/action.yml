@@ -57,6 +57,11 @@ inputs:
     description: 'The target system root to build for.'
     required: false
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
@@ -65,6 +70,7 @@ runs:
       run: chmod +x $GITHUB_ACTION_PATH/linux.sh
 
     - name: Build Linux app
+      id: build
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
         BUILD_NAME: ${{ inputs.build-name }}

@@ -14,3 +14,7 @@ FLAGS="$FLAGS --output=${OUTPUT:-build/web}"
 echo "▶️ Running flutter build web with flags: $FLAGS"
 flutter build web $FLAGS
 echo "✅ Web build complete."
+
+ARTIFACT_PATH="${OUTPUT:-build/web}"
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"

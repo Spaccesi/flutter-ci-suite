@@ -58,10 +58,16 @@ inputs:
     required: false
     default: 'false'
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
     - name: Build Android app
+      id: build
       env:
         ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
         ANDROID_STORE_PASSWORD: ${{ inputs.android-store-password }}

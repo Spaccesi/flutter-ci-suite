@@ -24,3 +24,11 @@ FLAGS="--$BUILD_MODE"
 echo "▶️ Running flutter build $BUILD_TYPE with flags: $FLAGS"
 flutter build "$BUILD_TYPE" $FLAGS
 echo "✅ Android build complete."
+
+if [ "$BUILD_TYPE" = "apk" ]; then
+  ARTIFACT_PATH="build/app/outputs/apk/$BUILD_MODE/app-$BUILD_MODE.apk"
+else
+  ARTIFACT_PATH="build/app/outputs/bundle/$BUILD_MODE/app-$BUILD_MODE.aab"
+fi
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"

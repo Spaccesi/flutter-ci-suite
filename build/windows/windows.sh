@@ -18,3 +18,8 @@ FLAGS="--$BUILD_MODE"
 echo "▶️ Running flutter build windows with flags: $FLAGS"
 flutter build windows $FLAGS
 echo "✅ Windows build complete."
+
+MODE_CAP="$(echo "${BUILD_MODE:0:1}" | tr '[:lower:]' '[:upper:]')${BUILD_MODE:1}"
+ARTIFACT_PATH="build/windows/x64/runner/$MODE_CAP"
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"

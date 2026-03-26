@@ -49,6 +49,11 @@ inputs:
     required: false
     default: 'false'
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
@@ -57,6 +62,7 @@ runs:
       run: chmod +x $GITHUB_ACTION_PATH/web.sh
 
     - name: Build web app
+      id: build
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
         DART_DEFINE: ${{ inputs.dart-define }}

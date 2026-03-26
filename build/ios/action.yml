@@ -62,6 +62,11 @@ inputs:
     description: Export an IPA with these options. See "xcodebuild -h" for available exportOptionsPlist keys.
     required: false
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
@@ -70,6 +75,7 @@ runs:
       run: chmod +x $GITHUB_ACTION_PATH/ios.sh
 
     - name: Build iOS app
+      id: build
       env:
         IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.ios-distribution-certificate-base64 }}
         IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ inputs.ios-distribution-certificate-password }}

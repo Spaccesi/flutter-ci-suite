@@ -64,3 +64,8 @@ FLAGS="--$BUILD_MODE"
 echo "▶️ Running flutter build macos with flags: $FLAGS"
 flutter build macos $FLAGS
 echo "✅ macOS build complete."
+
+MODE_CAP="$(echo "${BUILD_MODE:0:1}" | tr '[:lower:]' '[:upper:]')${BUILD_MODE:1}"
+ARTIFACT_PATH="build/macos/Build/Products/$MODE_CAP"
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"

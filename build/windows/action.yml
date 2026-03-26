@@ -59,6 +59,11 @@ inputs:
     description: 'The location to write code size analysis files.'
     required: false
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
@@ -67,6 +72,7 @@ runs:
       run: chmod +x $GITHUB_ACTION_PATH/windows.sh
 
     - name: Build Windows app
+      id: build
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
         BUILD_NAME: ${{ inputs.build-name }}

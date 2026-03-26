@@ -52,3 +52,7 @@ FLAGS="--$BUILD_MODE"
 echo "▶️ Running flutter build ipa with flags: $FLAGS"
 flutter build ipa $FLAGS
 echo "✅ iOS build complete."
+
+ARTIFACT_PATH="build/ios/ipa/*.ipa"
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"

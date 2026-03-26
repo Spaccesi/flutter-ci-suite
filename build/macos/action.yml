@@ -57,6 +57,11 @@ inputs:
     required: false
     default: 'true'
 
+outputs:
+  artifact-path:
+    description: 'Path to the built artifact'
+    value: ${{ steps.build.outputs.artifact-path }}
+
 runs:
   using: 'composite'
   steps:
@@ -65,6 +70,7 @@ runs:
       run: chmod +x $GITHUB_ACTION_PATH/macos.sh
 
     - name: Build macOS app
+      id: build
       env:
         MACOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.macos-distribution-certificate-base64 }}
         MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ inputs.macos-distribution-certificate-password }}

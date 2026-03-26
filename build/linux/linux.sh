@@ -22,3 +22,7 @@ FLAGS="--$BUILD_MODE"
 echo "▶️ Running flutter build linux with flags: $FLAGS"
 flutter build linux $FLAGS
 echo "✅ Linux build complete."
+
+ARTIFACT_PATH="build/linux/x64/$BUILD_MODE/bundle"
+echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+echo "✅ Artifact path: $ARTIFACT_PATH"
