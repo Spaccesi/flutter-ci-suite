@@ -571,7 +571,6 @@ runs:
         play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-track: ${{ inputs.play-store-track }}
         play-store-service-account-json: ${{ inputs.play-store-service-account-json }}
-        play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-release-files: ${{ steps.build-android-apk.outputs.artifact-path }}
 
     - name: Deploy to Play Store
@@ -581,7 +580,6 @@ runs:
         play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-track: ${{ inputs.play-store-track }}
         play-store-service-account-json: ${{ inputs.play-store-service-account-json }}
-        play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-release-files: ${{ steps.build-android-appbundle.outputs.artifact-path }}
 
     - name: Deploy to ios App Store
