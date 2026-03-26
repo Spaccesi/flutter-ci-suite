@@ -293,6 +293,13 @@ runs:
     # -- Setup Flutter -----------------------------------------------------
     - name: Check Flutter installed
       id: check-flutter
+      if: >-
+        inputs.build-platforms != '' ||
+        inputs.run-build-runner == 'true' ||
+        inputs.run-gen-l10n == 'true' ||
+        inputs.run-analyze == 'true' ||
+        inputs.run-license-check == 'true' ||
+        inputs.run-test == 'true'
       shell: bash
       run: |
         if command -v flutter &>/dev/null; then
@@ -303,7 +310,7 @@ runs:
         fi
 
     - name: Setup Flutter
-      if: steps.check-flutter.outputs.installed != 'true'
+      if: steps.check-flutter.conclusion == 'success' && steps.check-flutter.outputs.installed != 'true'
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ inputs.flutter-version }}
