@@ -69,7 +69,7 @@ inputs:
     description: 'List of platform to build. Be aware some platform builds need to be run on specific OS. Available options: android-apk, android-appbundle, ios, web, windows, macos, linux.'
     required: false
   publish-destinations:
-    description: 'List of platforms where to publish the built app. Be aware build needs to be run first and that not every destination is available for every platfomr. Available options: github-releases, store, firebase-app-distribution, github-artifacts, github-pages, firebase-hosting.'
+    description: 'List of platforms where to publish the built app. Be aware build needs to be run first and that not every destination is available for every platfomr. Available options: play-store, microsoft-store, ios-app-store, macos-app-store, snap-store, firebase-app-distribution, github-pages, firebase-hosting.'
     required: false
   build-mode:
     description: 'The build mode to use. Available options: debug, profile, release.'
@@ -500,19 +500,6 @@ runs:
         $GITHUB_ACTION_PATH/build/linux/linux.sh
 
     # -- Publish Github ------------------------------------------------------------
-    - name: Publish to GitHub Releases
-      if: contains(inputs.publish-destinations, 'github-releases')
-      uses: actions/create-release@v1
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-
-    - name: Upload artifact
-      if: contains(inputs.publish-destinations, 'github-artifact') || contains(inputs.publish-destinations, 'github-pages')
-      uses: actions/upload-pages-artifact@v4
-      with:
-        path: ${{ steps.build-web.outputs.artifact-path }}
-
     - name: Setup Pages
       if: contains(inputs.publish-destinations, 'github-pages') && contains(inputs.build-platforms, 'web')
       uses: actions/configure-pages@v5
@@ -608,6 +595,7 @@ runs:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
         apple-api-key-issuer-id: ${{ inputs.apple-api-key-issuer-id }}
         apple-api-key-content: ${{ inputs.apple-api-key-content }}
+        macos-app-path: ${{ steps.build-macos.outputs.artifact-path }}
 
     - name: Deploy to Linux Snap App Store
       if: contains(inputs.publish-destinations, 'snap-store') && contains(inputs.build-platforms, 'linux')
