@@ -216,8 +216,8 @@ runs:
         BUILD_MODE="${{ inputs.build-mode }}"
 
         # --- Firebase Hosting: only web is supported ---
-        if [ "$DESTINATION" = "firebase-hosting" ]; then
-          if [ "$PLATFORM" != "web" ]; then
+        if [[ "$DESTINATION" == *"firebase-hosting"* ]]; then
+          if [[ "$PLATFORM" != *"web"* ]]; then
             ERRORS+=("Firebase Hosting only supports the 'web' platform. Got: '$PLATFORM'.")
           fi
           if [ "${{ inputs.firebase-project-id }}" == "" ]; then
@@ -225,9 +225,9 @@ runs:
           fi
         fi
 
-        # --- Firebase App Distribution: web and linux are not supported ---
-        if [ "$DESTINATION" = "firebase-app-distribution" ]; then
-          if [ "$PLATFORM" != "android" ] && [ "$PLATFORM" != "ios" ]; then
+        # --- Firebase App Distribution: web, windows, macos and linux are not supported ---
+        if [[ "$DESTINATION" == *"firebase-app-distribution"* ]]; then
+          if [[ "$PLATFORM" == *"web"* ]] || [[ "$PLATFORM" == *"linux"* ]] || [[ "$PLATFORM" == *"windows"* ]] || [[ "$PLATFORM" == *"macos"* ]]; then
             ERRORS+=("Firebase App Distribution does not support the '$PLATFORM' platform.")
           fi
           if [ -z "${{ inputs.firebase-service-account-base64 }}" ]; then
@@ -236,7 +236,7 @@ runs:
         fi
 
         # --- Android: signing inputs required for release and profile builds ---
-        if [ "$PLATFORM" = "android" ] && [ "$BUILD_MODE" != "debug" ]; then
+        if [[ "$PLATFORM" == *"android"* ]] && [ "$BUILD_MODE" != "debug" ]; then
           if [ -z "${{ inputs.android-store-file-base64 }}" ]; then
             ERRORS+=("'android-store-file-base64' is required when building Android in '$BUILD_MODE' mode.")
           fi
