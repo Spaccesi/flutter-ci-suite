@@ -18,11 +18,11 @@ inputs:
 
   # Prepare step inputs
   run-build-runner:
-    description: 'Whether to run build_runner for code generation. This will run build_runner for all packages in the repository that have a build.yaml file.'
+    description: 'Whether to run build_runner for code generation. This will run build_runner for all packages in the repository that have a build_runner dependency on pubspec.yaml.'
     required: false
     default: 'false'
   run-gen-l10n:
-    description: 'Whether to run gen-l10n for code generation. This will run gen-l10n for all packages in the repository that have a l10n.yaml or l10n.yml file.'
+    description: 'Whether to run gen-l10n for code generation. This will run gen-l10n for all packages in the repository that have intl dependency on pubspec.yaml.'
     required: false
     default: 'false'
   gen-l10n-fails-if-untranslated:
@@ -39,12 +39,12 @@ inputs:
     description: 'Whether to run flutter analyze.'
     required: false
     default: 'false'
-  run-license:
+  run-license-check:
     description: 'Whether to check for licenses of dependencies.'
     required: false
     default: 'false'
-  run-coverage:
-    description: 'Whether to run tests with coverage and generate a coverage report.'
+  test-run-coverage:
+    description: 'Whether to run tests with coverage.'
     required: false
     default: 'false'
   analyze-fails-if-infos:
@@ -55,21 +55,21 @@ inputs:
     description: 'Whether to fail the analyze step if warning level issues are found.'
     required: false
     default: 'false'
-  compatible-licenses-conf-path:
-    description: 'Path to a YAML file containing a list of compatible licenses. Required if license is set to true. The YAML file should have the following format: compatible_licenses: - MIT - BSD-3-Clause - Apache-2.0'
+  licenses-conf-path:
+    description: 'Path to a YAML file containing a list of compatible licenses. Required if run-license-check is set to true. The YAML file should have the following format: compatible_licenses: - MIT - BSD-3-Clause - Apache-2.0'
     required: false
     default: ''
-  test-create-coverage-badge:
-    description: 'Whether to create a coverage badge based on the generated coverage report. The badge will be created in the root of the repository with the name "coverage_badge.svg".'
+  test-create-coverage-report:
+    description: 'Whether to create a coverage report based on the generated coverage data using lcov and genhtml.'
     required: false
     default: 'false'
 
   # General Build step inputs
-  build-platform:
-    description: 'List of platform to build. Be aware some platform builds need to be run on specific OS. Available options: android, ios, web, windows, macos, linux, none.'
+  build-platforms:
+    description: 'List of platform to build. Be aware some platform builds need to be run on specific OS. Available options: android-apk, android-appbundle, ios, web, windows, macos, linux.'
     required: false
-  publish-destination:
-    description: 'List of platforms where to publish the built app. Be aware build needs to be run first and that not every destination is available for every platfomr. Available options: none, github-releases, store, firebase-app-distribution, github-artifacts, github-pages, firebase-hosting.'
+  publish-destinations:
+    description: 'List of platforms where to publish the built app. Be aware build needs to be run first and that not every destination is available for every platfomr. Available options: github-releases, store, firebase-app-distribution, github-artifacts, github-pages, firebase-hosting.'
     required: false
   build-mode:
     description: 'The build mode to use. Available options: debug, profile, release.'
@@ -109,6 +109,9 @@ inputs:
   ios-provisioning-profile-base64:
     description: 'Base64 encoded provisioning profile for iOS. Required for building and signing iOS apps.'
     required: false
+  ios-export-options-plist:
+    description: 'Path to export options plist file for iOS.'
+    required: false
 
   # macOS Build & Publish step inputs
   macos-distribution-certificate-base64:
@@ -146,11 +149,6 @@ inputs:
     description: 'Target to publish to. Required for publishing to Firebase Hosting.'
     required: false
 
-  # Github pages
-  github-token:
-    description: 'Github token'
-    required: false
-
   # Android Build step inputs
   android-store-file-base64:
     description: 'Base64 encoded JKS or PKCS12 file containing the Android signing keystore. Required for building and signing Android apps.'
@@ -164,18 +162,18 @@ inputs:
   android-key-password:
     description: 'Password for the key to use from the Android signing keystore. Required for building and signing Android apps.'
     required: false
-  android-build-type:
-    description: 'The build mode to use when building the Android app. Available options: apk, appbundle. Default is appbundle.'
-    required: false
-    default: 'appbundle'
-  android-local-properties-file:
-    description: 'Path to a local.properties file containing the path to the Android SDK. This is required if the Android SDK is not available in the default location on the runner.'
-    required: false
-  android-service-account-json:
+  play-store-service-account-json:
     description: 'JSON file content for the Google Play Store service account. Required for publishing to Google Play Store.'
     required: false
   play-store-track:
     description: 'The track to publish the app to (e.g. alpha, beta, production)'
+    required: false
+  play-store-status:
+    description: 'The status of the release (e.g. completed, draft, halted, inProgress)'
+    required: false
+    default: 'completed'
+  play-store-package-name:
+    description: 'The package name of the Android app. Required for publishing to Google Play Store.'
     required: false
 
   # Windows Build step inputs
@@ -308,14 +306,14 @@ runs:
 
     - name: Run Build Runner
       shell: bash
-      if: ${{ inputs.run-build-runner != 'false' }}
+      if: ${{ inputs.run-build-runner == 'true' }}
       run: |
         chmod +x $GITHUB_ACTION_PATH/prepare/build_runner/build_runner.sh
         $GITHUB_ACTION_PATH/prepare/build_runner/build_runner.sh
 
     - name: Run gen-l10n
       shell: bash
-      if: ${{ inputs.run-gen-l10n != 'false' }}
+      if: ${{ inputs.run-gen-l10n == 'true' }}
       run: |
         chmod +x $GITHUB_ACTION_PATH/prepare/gen-l10n/gen-l10n.sh
         $GITHUB_ACTION_PATH/prepare/gen-l10n/gen-l10n.sh
@@ -337,7 +335,7 @@ runs:
     - name: Check Licenses
       if: ${{ inputs.run-license == 'true' }}
       env:
-        COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.compatible-licenses-conf-path }}
+        COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.licenses-conf-path }}
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/check/license/license.sh
@@ -353,9 +351,8 @@ runs:
         TIMEOUT: ${{ inputs.timeout }}
         IGNORE_TIMEOUTS: ${{ inputs.ignore-timeouts }}
         RUN_COVERAGE: ${{ inputs.run-coverage }}
-        CREATE_COVERAGE_BADGE: ${{ inputs.create-coverage-badge }}
+        CREATE_COVERAGE_REPORT: ${{ inputs.test-create-coverage-report }}
         NO_PUB: 'true'
-        COVERAGE_BADGE_OUTPUT_PATH: ${{ inputs.coverage-badge-output-path }} ### -------------
       shell: bash
       run: |
         chmod +x $GITHUB_ACTION_PATH/check/test/test.sh
@@ -363,8 +360,8 @@ runs:
 
     # -- Build --------------------------------------------------------------
     - name: Build android
-      id: build-android
-      if: contains(inputs.build-platform, 'android')
+      id: build-android-apk
+      if: contains(inputs.build-platform, 'android-apk')
       env:
         ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
         ANDROID_STORE_PASSWORD: ${{ inputs.android-store-password }}
@@ -372,7 +369,27 @@ runs:
         ANDROID_KEY_ALIAS: ${{ inputs.android-key-alias }}
         FLAVOR: ${{ inputs.flavor }}
         DART_DEFINE: ${{ inputs.dart-define }}
-        BUILD_TYPE: ${{ inputs.android-build-type }}
+        BUILD_TYPE: apk
+        BUILD_MODE: ${{ inputs.build-mode }}
+        BUILD_NAME: ${{ inputs.build-name }}
+        BUILD_NUMBER: ${{ inputs.build-number }}
+        NO_PUB: 'true'
+      shell: bash
+      run: |
+        chmod +x $GITHUB_ACTION_PATH/build/android/android.sh
+        $GITHUB_ACTION_PATH/build/android/android.sh
+
+    - name: Build android
+      id: build-android-appbundle
+      if: contains(inputs.build-platform, 'android-appbundle')
+      env:
+        ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
+        ANDROID_STORE_PASSWORD: ${{ inputs.android-store-password }}
+        ANDROID_KEY_PASSWORD: ${{ inputs.android-key-password }}
+        ANDROID_KEY_ALIAS: ${{ inputs.android-key-alias }}
+        FLAVOR: ${{ inputs.flavor }}
+        DART_DEFINE: ${{ inputs.dart-define }}
+        BUILD_TYPE: appbundle
         BUILD_MODE: ${{ inputs.build-mode }}
         BUILD_NAME: ${{ inputs.build-name }}
         BUILD_NUMBER: ${{ inputs.build-number }}
@@ -389,6 +406,7 @@ runs:
         IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.ios-distribution-certificate-base64 }}
         IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ inputs.ios-distribution-certificate-password }}
         IOS_PROVISIONING_PROFILE_BASE64: ${{ inputs.ios-provisioning-profile-base64 }}
+        EXPORT_OPTIONS_PLIST: ${{ inputs.ios-export-options-plist }}
         BUILD_MODE: ${{ inputs.build-mode }}
         FLAVOR: ${{ inputs.flavor }}
         DART_DEFINE: ${{ inputs.dart-define }}
@@ -519,16 +537,27 @@ runs:
 
     # -- Publish to stores ------------------------------------------------------------
     - name: Deploy to Play Store
-      if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'android')
+      if: contains(inputs.publish-destination, 'play-store') && contains(inputs.build-platform, 'android-apk')
       uses: Spaccesi/flutter-actions-suite/publish/play-store@main
       with:
-        android-package-name: ${{ inputs.play-store-package-name }}
-        android-track: ${{ inputs.play-store-track }}
-        android-service-account-json: ${{ inputs.android-service-account-json }}
-        android-release-files: ${{ steps.build-android.outputs.artifact-path }}
+        play-store-package-name: ${{ inputs.play-store-package-name }}
+        play-store-track: ${{ inputs.play-store-track }}
+        play-store-service-account-json: ${{ inputs.play-store-service-account-json }}
+        play-store-package-name: ${{ inputs.play-store-package-name }}
+        play-store-release-files: ${{ steps.build-android-apk.outputs.artifact-path }}
+
+    - name: Deploy to Play Store
+      if: contains(inputs.publish-destination, 'play-store') && contains(inputs.build-platform, 'android-appbundle')
+      uses: Spaccesi/flutter-actions-suite/publish/play-store@main
+      with:
+        play-store-package-name: ${{ inputs.play-store-package-name }}
+        play-store-track: ${{ inputs.play-store-track }}
+        play-store-service-account-json: ${{ inputs.play-store-service-account-json }}
+        play-store-package-name: ${{ inputs.play-store-package-name }}
+        play-store-release-files: ${{ steps.build-android-appbundle.outputs.artifact-path }}
 
     - name: Deploy to ios App Store
-      if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'ios')
+      if: contains(inputs.publish-destination, 'ios-app-store') && contains(inputs.build-platform, 'ios')
       uses: Spaccesi/flutter-actions-suite/publish/ios-app-store@main
       with:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
@@ -537,7 +566,7 @@ runs:
         ios-app-path: ${{ steps.build-ios.outputs.artifact-path }}
 
     - name: Deploy to Microsoft Store
-      if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'windows')
+      if: contains(inputs.publish-destination, 'microsoft-store') && contains(inputs.build-platform, 'windows')
       uses: Spaccesi/flutter-actions-suite/publish/microsoft-store@main
       with:
         microsoft-partner-center-tenant-id: ${{ inputs.microsoft-partner-center-tenant-id }}
@@ -547,7 +576,7 @@ runs:
         microsoft-store-app-id: ${{ inputs.microsoft-store-app-id }}
 
     - name: Deploy to Mac App Store
-      if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'macos')
+      if: contains(inputs.publish-destination, 'macos-app-store') && contains(inputs.build-platform, 'macos')
       uses: Spaccesi/flutter-actions-suite/publish/macos-app-store@main
       with:
         apple-api-key-id: ${{ inputs.macos-app-store-apple-id }}
@@ -555,8 +584,8 @@ runs:
         apple-api-key-content: ${{ inputs.macos-app-store-apple-key-content }}
         macos-app-path: ${{ steps.build-macos.outputs.artifact-path }}
 
-    - name: Deploy to Linux App Store
-      if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'linux')
+    - name: Deploy to Linux Snap App Store
+      if: contains(inputs.publish-destination, 'snap-store') && contains(inputs.build-platform, 'linux')
       uses: Spaccesi/flutter-actions-suite/publish/snap-store@main
       with:
         snap-store-token: ${{ inputs.snap-store-token }}
