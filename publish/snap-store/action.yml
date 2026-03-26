@@ -9,9 +9,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup LXD (for managed builds)
-      uses: canonical/setup-lxd@v0.1.2
-
     - name: Publish to Snap Store
       shell: bash
       env:
