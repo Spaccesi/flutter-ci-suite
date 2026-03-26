@@ -506,10 +506,18 @@ runs:
       with:
         enablement: true
 
+    - name: Upload artifact for GitHub Pages
+      if: contains(inputs.publish-destinations, 'github-pages') && contains(inputs.build-platforms, 'web')
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ${{ steps.build-web.outputs.artifact-path }}
+        name: web-build
+
     - name: Deploy to GitHub Pages
       if: contains(inputs.publish-destinations, 'github-pages') && contains(inputs.build-platforms, 'web')
-      id: deployment
       uses: actions/deploy-pages@v4
+      with:
+        artifact_name: web-build
 
     # -- Publish to firebase ------------------------------------------------------------
     - name: Publish iOS to Firebase App Distribution
