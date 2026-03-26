@@ -58,7 +58,7 @@ Each step of the pipeline is available as an independent action. This gives you 
 | **Gen L10n** | [`/prepare/gen-l10n`](./prepare/gen-l10n) | Run `gen-l10n` localization across the repository. |
 | **Docs** | [`/docs`](./docs) | Generate project documentation with `dartdoc`. |
 | **Build** | [`/build/{platform}`](./build) | Build project (ios/android/web/macos/windows/linux). |
-| **Publish** | [`/publish/{platform}`](./publish) | TODO |
+| **Publish** | [`/publish/{store}`](./publish) | Publish project (ios-app-store/macos-app-store/play-store/firebase-app-distribution/firebase-hosting/snap-store/microsoft-store/...)  |
 
 You can use sub-actions to have more granular control:
 
