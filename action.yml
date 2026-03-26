@@ -67,10 +67,10 @@ inputs:
   # General Build step inputs
   build-platform:
     description: 'List of platform to build. Be aware some platform builds need to be run on specific OS. Available options: android, ios, web, windows, macos, linux, none.'
-    required: true
+    required: false
   publish-destination:
     description: 'List of platforms where to publish the built app. Be aware build needs to be run first and that not every destination is available for every platfomr. Available options: none, github-releases, store, firebase-app-distribution, github-artifacts, github-pages, firebase-hosting.'
-    required: true
+    required: false
   build-mode:
     description: 'The build mode to use. Available options: debug, profile, release.'
     required: false
