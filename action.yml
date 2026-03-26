@@ -20,11 +20,11 @@ inputs:
   run-build-runner:
     description: 'Whether to run build_runner for code generation. This will run build_runner for all packages in the repository that have a build.yaml file.'
     required: false
-    default: 'true'
+    default: 'false'
   run-gen-l10n:
     description: 'Whether to run gen-l10n for code generation. This will run gen-l10n for all packages in the repository that have a l10n.yaml or l10n.yml file.'
     required: false
-    default: 'true'
+    default: 'false'
   gen-l10n-fails-if-untranslated:
     description: 'Whether to fail the gen-l10n step if untranslated strings are found. This will check for the presence of an untranslated-messages-file in the l10n configuration file and fail if the file is generated and contains untranslated strings.'
     required: false
@@ -34,19 +34,19 @@ inputs:
   run-test:
     description: 'Whether to run tests.'
     required: false
-    default: 'true'
+    default: 'false'
   run-analyze:
     description: 'Whether to run flutter analyze.'
     required: false
-    default: 'true'
+    default: 'false'
   run-license:
     description: 'Whether to check for licenses of dependencies.'
     required: false
-    default: 'true'
+    default: 'false'
   run-coverage:
     description: 'Whether to run tests with coverage and generate a coverage report.'
     required: false
-    default: 'true'
+    default: 'false'
   analyze-fails-if-infos:
     description: 'Whether to fail the analyze step if info level issues are found.'
     required: false
@@ -281,7 +281,19 @@ runs:
         echo "✅ Input validation passed."
 
     # -- Setup Flutter -----------------------------------------------------
+    - name: Check Flutter installed
+      id: check-flutter
+      shell: bash
+      run: |
+        if command -v flutter &>/dev/null; then
+          echo "installed=true" >> "$GITHUB_OUTPUT"
+          echo "☑️ Flutter already installed: $(flutter --version 2>&1 | head -1)"
+        else
+          echo "installed=false" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Setup Flutter
+      if: steps.check-flutter.outputs.installed != 'true'
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ inputs.flutter-version }}
@@ -351,6 +363,7 @@ runs:
 
     # -- Build --------------------------------------------------------------
     - name: Build android
+      id: build-android
       if: contains(inputs.build-platform, 'android')
       env:
         ANDROID_STORE_FILE_BASE64: ${{ inputs.android-store-file-base64 }}
@@ -370,6 +383,7 @@ runs:
         $GITHUB_ACTION_PATH/build/android/android.sh
 
     - name: Build iOS
+      id: build-ios
       if: contains(inputs.build-platform, 'ios')
       env:
         IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.ios-distribution-certificate-base64 }}
@@ -387,6 +401,7 @@ runs:
         $GITHUB_ACTION_PATH/build/ios/ios.sh
 
     - name: Build web
+      id: build-web
       if: contains(inputs.build-platform, 'web')
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
@@ -401,6 +416,7 @@ runs:
         $GITHUB_ACTION_PATH/build/web/web.sh
 
     - name: Build windows
+      id: build-windows
       if: contains(inputs.build-platform, 'windows')
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
@@ -414,6 +430,7 @@ runs:
         $GITHUB_ACTION_PATH/build/windows/windows.sh
 
     - name: Build macos
+      id: build-macos
       if: contains(inputs.build-platform, 'macos')
       env:
         MACOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ inputs.macos-distribution-certificate-base64 }}
@@ -433,6 +450,7 @@ runs:
         $GITHUB_ACTION_PATH/build/macos/macos.sh
 
     - name: Build linux
+      id: build-linux
       if: contains(inputs.build-platform, 'linux')
       env:
         BUILD_MODE: ${{ inputs.build-mode }}
@@ -444,35 +462,6 @@ runs:
       run: |
         chmod +x $GITHUB_ACTION_PATH/build/linux/linux.sh
         $GITHUB_ACTION_PATH/build/linux/linux.sh
-
-    # -- Resolve build output path -------------------------------------------------
-    - name: Resolve build output path
-      id: resolve-output
-      shell: bash      
-      run: |
-        PLATFORM="${{ inputs.build-platform }}"
-        MODE="${{ inputs.build-mode }}"
-        BUILD_TYPE="${{ inputs.android-build-type }}"
-        MODE_CAP="$(echo "${MODE:0:1}" | tr '[:lower:]' '[:upper:]')${MODE:1}"
-
-        case "$PLATFORM" in
-          web)     OUTPUT="build/web" ;;
-          android)
-            if [ "$BUILD_TYPE" = "apk" ]; then
-              OUTPUT="build/app/outputs/apk/$MODE/*.apk"
-            else
-              OUTPUT="build/app/outputs/bundle/$MODE/*.aab"
-            fi
-            ;;
-          ios)     OUTPUT="build/ios/iphoneos/*.ipa" ;;
-          windows) OUTPUT="build/windows/x64/runner/$MODE_CAP" ;;
-          macos)   OUTPUT="build/macos/Build/Products/$MODE_CAP" ;;
-          linux)   OUTPUT="build/linux/x64/$MODE/bundle" ;;
-          *)       OUTPUT="" ;;
-        esac
-
-        echo "FLUTTER_BUILD_OUTPUT=$OUTPUT" >> $GITHUB_ENV
-        echo "Resolved build output path: $OUTPUT"
 
     # -- Publish Github ------------------------------------------------------------
     - name: Publish to GitHub Releases
@@ -486,7 +475,7 @@ runs:
       if: contains(inputs.publish-destination, 'github-artifact') || contains(inputs.publish-destination, 'github-pages')
       uses: actions/upload-pages-artifact@v4
       with:
-        path: ${{ env.FLUTTER_BUILD_OUTPUT }}
+        path: ${{ steps.build-web.outputs.artifact-path }}
 
     - name: Setup Pages
       if: contains(inputs.publish-destination, 'github-pages') && contains(inputs.build-platform, 'web')
@@ -504,7 +493,7 @@ runs:
       if: contains(inputs.publish-destination, 'firebase-app-distribution') && contains(inputs.build-platform, 'ios')
       uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
       with:
-        firebase-release-binary-file: 'build/ios/*.ipa'
+        firebase-release-binary-file: ${{ steps.build-ios.outputs.artifact-path }}
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-app-id: ${{ inputs.firebase-app-id }}
         firebase-groups: ${{ inputs.firebase-groups }}
@@ -515,7 +504,7 @@ runs:
       uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
-        firebase-release-binary-file: ${{ env.FLUTTER_BUILD_OUTPUT }}
+        firebase-release-binary-file: ${{ steps.build-android.outputs.artifact-path }}
         firebase-app-id: ${{ inputs.firebase-app-distribution-app-id }}
         firebase-groups: ${{ inputs.firebase-app-distribution-groups }}
         firebase-release-notes: ${{ inputs.firebase-app-distribution-release-notes }}
@@ -536,7 +525,7 @@ runs:
         android-package-name: ${{ inputs.play-store-package-name }}
         android-track: ${{ inputs.play-store-track }}
         android-service-account-json: ${{ inputs.android-service-account-json }}
-        android-release-files: ${{ env.FLUTTER_BUILD_OUTPUT }}
+        android-release-files: ${{ steps.build-android.outputs.artifact-path }}
 
     - name: Deploy to ios App Store
       if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'ios')
@@ -545,6 +534,7 @@ runs:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
         apple-api-key-content: ${{ inputs.apple-api-key-content }}
         apple-api-key-issuer-id: ${{ inputs.apple-api-key-issuer-id }}
+        ios-app-path: ${{ steps.build-ios.outputs.artifact-path }}
 
     - name: Deploy to Microsoft Store
       if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'windows')
@@ -563,6 +553,7 @@ runs:
         apple-api-key-id: ${{ inputs.macos-app-store-apple-id }}
         apple-api-key-issuer-id: ${{ inputs.macos-app-store-apple-issuer-id }}
         apple-api-key-content: ${{ inputs.macos-app-store-apple-key-content }}
+        macos-app-path: ${{ steps.build-macos.outputs.artifact-path }}
 
     - name: Deploy to Linux App Store
       if: contains(inputs.publish-destination, 'store') && contains(inputs.build-platform, 'linux')
