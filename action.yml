@@ -352,7 +352,7 @@ runs:
         $GITHUB_ACTION_PATH/check/analyze/analyze.sh
       
     - name: Check Licenses
-      if: ${{ inputs.run-license == 'true' }}
+      if: ${{ inputs.run-license-check == 'true' }}
       env:
         COMPATIBLE_LICENSES_CONF_PATH: ${{ inputs.licenses-conf-path }}
       shell: bash
@@ -526,8 +526,8 @@ runs:
       with:
         firebase-release-binary-file: ${{ steps.build-ios.outputs.artifact-path }}
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
-        firebase-app-id: ${{ inputs.firebase-app-id }}
-        firebase-groups: ${{ inputs.firebase-groups }}
+        firebase-app-id: ${{ inputs.firebase-app-distribution-app-id }}
+        firebase-groups: ${{ inputs.firebase-app-distribution-groups }}
         firebase-release-notes: ${{ inputs.release-notes }}
 
     - name: Publish android to Firebase App Distribution (APK)
@@ -535,7 +535,7 @@ runs:
       uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
-        firebase-release-binary-file: ${{ steps.build-android.outputs.artifact-path }}
+        firebase-release-binary-file: ${{ steps.build-android-apk.outputs.artifact-path }}
         firebase-app-id: ${{ inputs.firebase-app-distribution-app-id }}
         firebase-groups: ${{ inputs.firebase-app-distribution-groups }}
         firebase-release-notes: ${{ inputs.release-notes }}
