@@ -13,8 +13,7 @@ inputs:
     required: true
   macos-app-path:
     description: 'Path to the macOS .pkg file'
-    required: false
-    default: 'build/macos/pkg/*.pkg'
+    required: true
 
 runs:
   using: composite

@@ -12,8 +12,7 @@ inputs:
     required: true
   play-store-release-files:
     description: 'The release files to publish to the Play Store (e.g. build/app/outputs/bundle/release/app-release.aab)'
-    required: false
-    default: 'build/app/outputs/bundle/**/*.aab'
+    required: true
   play-store-status:
     description: 'The status of the release (e.g. completed, draft, halted, inProgress)'
     required: false

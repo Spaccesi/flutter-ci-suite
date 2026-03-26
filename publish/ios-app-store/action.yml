@@ -16,8 +16,7 @@ inputs:
     required: true
   ios-app-path:
     description: 'Path to the iOS .ipa file'
-    required: false
-    default: 'build/ios/ipa/*.ipa'
+    required: true
 
 runs:
   using: composite
