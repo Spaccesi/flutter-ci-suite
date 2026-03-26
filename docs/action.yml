@@ -19,5 +19,5 @@ runs:
       shell: bash
       run: |
         dartdoc \
-          --output ${ { inputs.output-directory } } \
+          --output ${{ inputs.output-directory }} \
           ${{ inputs.validate-links == 'true' && '--validate-links' || '' }}
