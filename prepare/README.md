@@ -6,12 +6,12 @@ A composite action that prepares a Flutter repository for builds and checks by i
 
 ```yaml
 - name: Prepare
-  uses: Spaccesi/flutter-actions-suite/prepare@main
+  uses: Spaccesi/flutter-ci-suite/prepare@main
 ```
 
 ```yaml
 - name: Prepare
-  uses: Spaccesi/flutter-actions-suite/prepare@main
+  uses: Spaccesi/flutter-ci-suite/prepare@main
   with:
     run-build-runner: 'true'
     run-gen-l10n: 'true'

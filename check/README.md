@@ -6,7 +6,7 @@ A composite action that orchestrates static analysis, dependency license checkin
 
 ```yaml
 - name: Run Checks
-  uses: Spaccesi/flutter-actions-suite/check@main
+  uses: Spaccesi/flutter-ci-suite/check@main
   with:
     compatible-licenses-conf-path: 'licenses.yaml'
     run-coverage: 'true'

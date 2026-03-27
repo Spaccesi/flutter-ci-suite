@@ -64,10 +64,10 @@ You can use sub-actions to have more granular control:
 
 ```yaml
 - name: Code Generation
-  uses: Spaccesi/flutter-actions-suite/prepare/build_runner@main
+  uses: Spaccesi/flutter-ci-suite/prepare/build_runner@main
 
 - name: Run Tests
-  uses: Spaccesi/flutter-actions-suite/check/test@main
+  uses: Spaccesi/flutter-ci-suite/check/test@main
   with:
     run-coverage: 'true'
 ```

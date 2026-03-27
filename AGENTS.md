@@ -1,4 +1,4 @@
-# AGENTS.md — flutter-actions-suite
+# AGENTS.md — flutter-ci-suite
 
 ## Repository Overview
 
@@ -7,7 +7,7 @@ Dart/Flutter source code here — the languages are **YAML** (action interfaces)
 (implementations). Actions are consumed as:
 
 ```yaml
-uses: Spaccesi/flutter-actions-suite/<subpath>@main
+uses: Spaccesi/flutter-ci-suite/<subpath>@main
 ```
 
 The four pipeline stages are: `prepare/` → `check/` → `build/` → `publish/`

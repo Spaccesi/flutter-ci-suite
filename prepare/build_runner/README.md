@@ -6,7 +6,7 @@ Automatically discovers and runs code generation using `build_runner` for all Fl
 
 ```yaml
 - name: Code Generation
-  uses: spaccesi/flutter-actions-suite/build_runner@v1
+  uses: spaccesi/flutter-ci-suite/build_runner@v1
 ```
 
 No inputs required. The action handles everything automatically.

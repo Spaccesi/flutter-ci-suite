@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A **reusable GitHub Actions composite action library** for Flutter CI/CD. There is **no Dart/Flutter source code** — only YAML (action interfaces) and Bash (implementations). Actions are consumed as `uses: Spaccesi/flutter-actions-suite/<subpath>@main`.
+A **reusable GitHub Actions composite action library** for Flutter CI/CD. There is **no Dart/Flutter source code** — only YAML (action interfaces) and Bash (implementations). Actions are consumed as `uses: Spaccesi/flutter-ci-suite/<subpath>@main`.
 
 See `AGENTS.md` for the full contributor guide. This file highlights what's most relevant for AI-assisted work.
 

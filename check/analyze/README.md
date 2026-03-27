@@ -6,7 +6,7 @@ Runs `flutter analyze` and formatting checks with configurable severity levels.
 
 ```yaml
 - name: Analyze
-  uses: Spaccesi/flutter-actions-suite/check/analyze@main
+  uses: Spaccesi/flutter-ci-suite/check/analyze@main
   with:
     analyze-fails-if-warnings: true
     analyze-fails-if-infos: true

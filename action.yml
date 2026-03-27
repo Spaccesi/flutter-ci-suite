@@ -522,7 +522,7 @@ runs:
     # -- Publish to firebase ------------------------------------------------------------
     - name: Publish iOS to Firebase App Distribution
       if: contains(inputs.publish-destinations, 'firebase-app-distribution') && contains(inputs.build-platforms, 'ios')
-      uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
+      uses: Spaccesi/flutter-ci-suite/publish/firebase-app-distribution@main
       with:
         firebase-release-binary-file: ${{ steps.build-ios.outputs.artifact-path }}
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
@@ -532,7 +532,7 @@ runs:
 
     - name: Publish android to Firebase App Distribution (APK)
       if: contains(inputs.publish-destinations, 'firebase-app-distribution') && contains(inputs.build-platforms, 'android-apk')
-      uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
+      uses: Spaccesi/flutter-ci-suite/publish/firebase-app-distribution@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-release-binary-file: ${{ steps.build-android-apk.outputs.artifact-path }}
@@ -542,7 +542,7 @@ runs:
 
     - name: Publish android to Firebase App Distribution (App Bundle)
       if: contains(inputs.publish-destinations, 'firebase-app-distribution') && contains(inputs.build-platforms, 'android-appbundle')
-      uses: Spaccesi/flutter-actions-suite/publish/firebase-app-distribution@main
+      uses: Spaccesi/flutter-ci-suite/publish/firebase-app-distribution@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-release-binary-file: ${{ steps.build-android-appbundle.outputs.artifact-path }}
@@ -552,7 +552,7 @@ runs:
 
     - name: Publish to Firebase Hosting
       if: contains(inputs.publish-destinations, 'firebase-hosting') && contains(inputs.build-platforms, 'web')
-      uses: Spaccesi/flutter-actions-suite/publish/firebase-hosting@main
+      uses: Spaccesi/flutter-ci-suite/publish/firebase-hosting@main
       with:
         firebase-service-account-base64: ${{ inputs.firebase-service-account-base64 }}
         firebase-target: ${{ inputs.firebase-hosting-target }}
@@ -561,7 +561,7 @@ runs:
     # -- Publish to stores ------------------------------------------------------------
     - name: Deploy to Play Store
       if: contains(inputs.publish-destinations, 'play-store') && contains(inputs.build-platforms, 'android-apk')
-      uses: Spaccesi/flutter-actions-suite/publish/play-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/play-store@main
       with:
         play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-track: ${{ inputs.play-store-track }}
@@ -570,7 +570,7 @@ runs:
 
     - name: Deploy to Play Store
       if: contains(inputs.publish-destinations, 'play-store') && contains(inputs.build-platforms, 'android-appbundle')
-      uses: Spaccesi/flutter-actions-suite/publish/play-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/play-store@main
       with:
         play-store-package-name: ${{ inputs.play-store-package-name }}
         play-store-track: ${{ inputs.play-store-track }}
@@ -579,7 +579,7 @@ runs:
 
     - name: Deploy to ios App Store
       if: contains(inputs.publish-destinations, 'ios-app-store') && contains(inputs.build-platforms, 'ios')
-      uses: Spaccesi/flutter-actions-suite/publish/ios-app-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/ios-app-store@main
       with:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
         apple-api-key-content: ${{ inputs.apple-api-key-content }}
@@ -588,7 +588,7 @@ runs:
 
     - name: Deploy to Microsoft Store
       if: contains(inputs.publish-destinations, 'microsoft-store') && contains(inputs.build-platforms, 'windows')
-      uses: Spaccesi/flutter-actions-suite/publish/microsoft-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/microsoft-store@main
       with:
         microsoft-partner-center-tenant-id: ${{ inputs.microsoft-partner-center-tenant-id }}
         microsoft-partner-center-seller-id: ${{ inputs.microsoft-partner-center-seller-id }}
@@ -598,7 +598,7 @@ runs:
 
     - name: Deploy to Mac App Store
       if: contains(inputs.publish-destinations, 'macos-app-store') && contains(inputs.build-platforms, 'macos')
-      uses: Spaccesi/flutter-actions-suite/publish/macos-app-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/macos-app-store@main
       with:
         apple-api-key-id: ${{ inputs.apple-api-key-id }}
         apple-api-key-issuer-id: ${{ inputs.apple-api-key-issuer-id }}
@@ -607,6 +607,6 @@ runs:
 
     - name: Deploy to Linux Snap App Store
       if: contains(inputs.publish-destinations, 'snap-store') && contains(inputs.build-platforms, 'linux')
-      uses: Spaccesi/flutter-actions-suite/publish/snap-store@main
+      uses: Spaccesi/flutter-ci-suite/publish/snap-store@main
       with:
         snap-store-token: ${{ inputs.snap-store-token }}

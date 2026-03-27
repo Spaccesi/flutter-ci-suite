@@ -26,7 +26,7 @@ Use a platform sub-action directly when Flutter is already set up in a previous 
 
 ```yaml
 - name: Build iOS
-  uses: spaccesi/flutter-actions-suite/build/ios@v1
+  uses: spaccesi/flutter-ci-suite/build/ios@v1
   with:
     flavor: 'production'
     build-name: '1.0.0'
