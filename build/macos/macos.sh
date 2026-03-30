@@ -66,6 +66,8 @@ flutter build macos $FLAGS
 echo "✅ macOS build complete."
 
 MODE_CAP="$(echo "${BUILD_MODE:0:1}" | tr '[:lower:]' '[:upper:]')${BUILD_MODE:1}"
-ARTIFACT_PATH="build/macos/Build/Products/$MODE_CAP"
+PRODUCTS_PATH="build/macos/Build/Products/$MODE_CAP"
+APP_BUNDLE=$(ls "$PRODUCTS_PATH" | grep '\.app$' | head -1)
+ARTIFACT_PATH="$PRODUCTS_PATH/$APP_BUNDLE"
 echo "artifact-path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
 echo "✅ Artifact path: $ARTIFACT_PATH"
