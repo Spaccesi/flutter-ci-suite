@@ -9,10 +9,11 @@ echo "$API_KEY_CONTENT" | base64 --decode > ~/.appstoreconnect/private_keys/Auth
 echo "✅ API key written."
 
 echo "▶️ Resolving .pkg file path"
-PKG_FILE=$(ls $MACOS_APP_PATH 2>/dev/null | head -1)
+PRODUCTS_DIR=$(dirname "$MACOS_APP_PATH")
+PKG_FILE=$(ls "$PRODUCTS_DIR"/*.pkg 2>/dev/null | head -1)
 
 if [ "$PKG_FILE" == '' ]; then
-  echo "::error::🚨 No .pkg file found at '$MACOS_APP_PATH'. Make sure the macOS build step ran successfully before this action."
+  echo "::error::🚨 No .pkg file found in '$PRODUCTS_DIR'. Make sure the macOS build step ran successfully before this action."
   exit 1
 fi
 echo "☑️ Found .pkg file: $PKG_FILE"
