@@ -502,7 +502,7 @@ runs:
     # -- Publish Github ------------------------------------------------------------
     - name: Setup Pages
       if: contains(inputs.publish-destinations, 'github-pages') && contains(inputs.build-platforms, 'web')
-      uses: actions/configure-pages@v5
+      uses: actions/configure-pages@v6
       with:
         enablement: true
 
