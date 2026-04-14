@@ -515,7 +515,7 @@ runs:
 
     - name: Deploy to GitHub Pages
       if: contains(inputs.publish-destinations, 'github-pages') && contains(inputs.build-platforms, 'web')
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
       with:
         artifact_name: web-build
 
