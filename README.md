@@ -7,11 +7,10 @@ This GitHub Action prepares, checks, builds and deploys Flutter applications for
 - **Modular Architecture**: Use the full pipeline or individual actions independently.
 - **Pre-build hooks**: Automatic `build_runner` and `gen-l10n` code generation.
 - **Checks and Testing**: Run checks and tests with coverage reports.
-- **Documentation**: Generate project documentation with `dartdoc`.
 - **Build & Signing**: Automated signing setup for iOS and Android and support for iOS, Android, Web, macOS, Windows, and Linux builds.
 - **Publish**:
     - iOS: App Store Connect, Firebase App Distribution.
-    - Android: Play Store, Firebase App Distribution.
+    - Android: Play Store, Firebase App Distribution, Huawei App Gallery (future).
     - Web: Firebase Hosting, Github Pages.
     - macOS: App Store Connect.
     - Linux: Snap Store.
@@ -19,7 +18,7 @@ This GitHub Action prepares, checks, builds and deploys Flutter applications for
 
 # Usage
 
-You have two options: use the [main action](/action.yml) to manage the full build and deployment of a Flutter project on a single platform, or use actions modularly to create your own flow. The [Examples](/examples/) folder is a good starting point — you may find what you are looking for there.
+You have two options: use the [main action](/action.yml) to manage the full build and deployment of a Flutter project on a single platform, or use actions modularly to create your own flow.
 
 ## Main action
 
@@ -56,7 +55,6 @@ Each step of the pipeline is available as an independent action. This gives you 
 | **Prepare** | [`/prepare`](./prepare) | Composite action for environment setup and code generation. |
 | **Build Runner** | [`/prepare/build_runner`](./prepare/build_runner) | Run `build_runner` across the repository. |
 | **Gen L10n** | [`/prepare/gen-l10n`](./prepare/gen-l10n) | Run `gen-l10n` localization across the repository. |
-| **Docs** | [`/docs`](./docs) | Generate project documentation with `dartdoc`. |
 | **Build** | [`/build/{platform}`](./build) | Build project (ios/android/web/macos/windows/linux). |
 | **Publish** | [`/publish/{store}`](./publish) | Publish project (ios-app-store/macos-app-store/play-store/firebase-app-distribution/firebase-hosting/snap-store/microsoft-store/...)  |
 
@@ -64,10 +62,10 @@ You can use sub-actions to have more granular control:
 
 ```yaml
 - name: Code Generation
-  uses: Spaccesi/flutter-ci-suite/prepare/build_runner@main
+  uses: Spaccesi/flutter-ci-suite/prepare/build_runner@v1
 
 - name: Run Tests
-  uses: Spaccesi/flutter-ci-suite/check/test@main
+  uses: Spaccesi/flutter-ci-suite/check/test@v1
   with:
     run-coverage: 'true'
 ```
@@ -105,3 +103,113 @@ In particular, for monorepos, this package relies on workspaces to work correctl
 - **macOS/iOS**: Requires `macos` runner.
 - **Windows**: Requires `windows` runner.
 - **Linux**: Requires `ubuntu` runner.
+
+## Inputs Reference
+
+### Flutter
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `flutter-version` | | Flutter version to use. Defaults to latest stable if omitted. |
+| `flutter-channel` | `stable` | Flutter channel (`stable`, `beta`, `dev`, `master`). |
+
+### Prepare
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `run-build-runner` | `false` | Run `build_runner` for all packages with a `build_runner` dependency. |
+| `run-gen-l10n` | `false` | Run `gen-l10n` for all packages with an `intl` dependency. |
+| `gen-l10n-fails-if-untranslated` | `false` | Fail if untranslated strings are found after `gen-l10n`. |
+
+### Check
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `run-analyze` | `false` | Run `flutter analyze`. |
+| `run-test` | `false` | Run unit and widget tests. |
+| `run-license-check` | `false` | Validate dependency licenses against an allowlist. |
+| `analyze-fails-if-infos` | `false` | Fail analyze step on info-level issues. |
+| `analyze-fails-if-warnings` | `false` | Fail analyze step on warning-level issues. |
+| `licenses-conf-path` | | Path to a YAML file listing compatible licenses. Required when `run-license-check` is `true`. |
+| `test-run-coverage` | `false` | Collect code coverage during tests. |
+| `test-create-coverage-report` | `false` | Generate an HTML coverage report using `lcov`/`genhtml`. |
+
+### Build
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `build-platforms` | | Platforms to build. Options: `android-apk`, `android-appbundle`, `ios`, `web`, `macos`, `windows`, `linux`. |
+| `build-mode` | `release` | Build mode: `debug`, `profile`, or `release`. |
+| `build-name` | | Version name shown to users. Defaults to `pubspec.yaml` value. |
+| `build-number` | | Internal version number. Defaults to `pubspec.yaml` value. |
+| `flavor` | | Flutter flavor to build. |
+| `dart-define` | | Comma-separated `key=value` pairs passed as `--dart-define`. |
+
+### Publish
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `publish-destinations` | | Publish targets. Options: `ios-app-store`, `macos-app-store`, `play-store`, `firebase-app-distribution`, `firebase-hosting`, `github-pages`, `snap-store`, `microsoft-store`. |
+| `release-notes` | | Release notes forwarded to Firebase App Distribution and Play Store. |
+
+### iOS signing & publish
+
+| Input | Description |
+| --- | --- |
+| `ios-distribution-certificate-base64` | Base64-encoded P12 distribution certificate. Required for iOS builds. |
+| `ios-distribution-certificate-password` | Password for the iOS distribution certificate. |
+| `ios-provisioning-profile-base64` | Base64-encoded iOS provisioning profile. |
+| `ios-export-options-plist` | Path to an `ExportOptions.plist` file. |
+| `apple-api-key-id` | App Store Connect API key ID. Required for iOS/macOS App Store publish. |
+| `apple-api-key-issuer-id` | App Store Connect API issuer ID (UUID). Required for iOS/macOS App Store publish. |
+| `apple-api-key-content` | Base64-encoded `.p8` private key. Required for iOS/macOS App Store publish. |
+
+### macOS signing & publish
+
+| Input | Description |
+| --- | --- |
+| `macos-distribution-certificate-base64` | Base64-encoded P12 distribution certificate. Required for macOS builds. |
+| `macos-distribution-certificate-password` | Password for the macOS distribution certificate. |
+| `macos-installer-certificate-base64` | Base64-encoded P12 installer certificate (`3rd Party Mac Developer Installer`). Required for macOS App Store publish. |
+| `macos-installer-certificate-password` | Password for the macOS installer certificate. |
+| `macos-provisioning-profile-base64` | Base64-encoded macOS provisioning profile. |
+
+### Android signing & publish
+
+| Input | Description |
+| --- | --- |
+| `android-store-file-base64` | Base64-encoded JKS/PKCS12 keystore. Required for release/profile Android builds. |
+| `android-key-alias` | Key alias within the keystore. |
+| `android-store-password` | Keystore password. |
+| `android-key-password` | Key password. |
+| `play-store-service-account-json` | Google Play service account JSON (plain text, not base64). Required for Play Store publish. |
+| `play-store-package-name` | App package name (e.g. `com.example.myapp`). Required for Play Store publish. |
+| `play-store-track` | Play Store track: `internal`, `alpha`, `beta`, `production`. |
+| `play-store-status` | Release status: `completed`, `draft`, `halted`, `inProgress`. Defaults to `completed`. |
+
+### Web & Firebase
+
+| Input | Description |
+| --- | --- |
+| `base-href` | Overrides the `<base href>` in `web/index.html`. Must start and end with `/`. |
+| `firebase-service-account-base64` | Base64-encoded Firebase service account JSON. Required for Firebase Hosting and App Distribution. |
+| `firebase-project-id` | Firebase project ID. Required for Firebase Hosting. |
+| `firebase-hosting-target` | Firebase Hosting target name. |
+| `firebase-app-distribution-app-id` | Firebase App ID (e.g. `1:1234567890:android:abcdef`). Required for Firebase App Distribution. |
+| `firebase-app-distribution-groups` | Comma-separated tester groups for Firebase App Distribution. |
+
+### Windows & Microsoft Store
+
+| Input | Description |
+| --- | --- |
+| `microsoft-partner-center-tenant-id` | Azure AD tenant ID. |
+| `microsoft-partner-center-seller-id` | Partner Center seller ID. |
+| `microsoft-partner-center-client-id` | Azure AD app client ID. |
+| `microsoft-partner-center-client-secret` | Azure AD app client secret. |
+| `microsoft-store-app-id` | Microsoft Store app ID. |
+
+### Linux & Snap Store
+
+| Input | Description |
+| --- | --- |
+| `snap-store-token` | Snap Store API token with publish permissions. |

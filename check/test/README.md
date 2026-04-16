@@ -8,14 +8,14 @@ Runs Flutter tests with optional coverage reporting and optionally deployment to
 
 ```yaml
 - name: Test
-  uses: Spaccesi/flutter-ci-suite/check/test@main
+  uses: Spaccesi/flutter-ci-suite/check/test@v1
 ```
 
 ### With Coverage Report & Deployment
 
 ```yaml
 - name: Test with Coverage
-  uses: Spaccesi/flutter-ci-suite/check/test@main
+  uses: Spaccesi/flutter-ci-suite/check/test@v1
   with:
     run-coverage: 'true'
 ```

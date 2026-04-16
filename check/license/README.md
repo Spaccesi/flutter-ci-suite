@@ -6,7 +6,7 @@ Check that all dependency licenses are compatible with your project. This action
 
 ```yaml
 - name: Check Licenses
-  uses: Spaccesi/flutter-ci-suite/check/license@main
+  uses: Spaccesi/flutter-ci-suite/check/license@v1
   with:
     compatible-licenses-conf-path: 'config/compatible_licenses.yaml'
 ```

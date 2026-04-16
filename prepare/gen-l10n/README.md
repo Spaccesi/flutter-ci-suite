@@ -6,7 +6,7 @@ Automatically discovers and runs localization code generation using `flutter gen
 
 ```yaml
 - name: Localization
-  uses: spaccesi/flutter-ci-suite/gen-l10n@main
+  uses: spaccesi/flutter-ci-suite/gen-l10n@v1
 ```
 
 No inputs required. The action handles everything automatically.
