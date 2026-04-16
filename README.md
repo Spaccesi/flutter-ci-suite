@@ -70,29 +70,6 @@ You can use sub-actions to have more granular control:
     run-coverage: 'true'
 ```
 
-## Parallel multi-platform CI with jobs
-
-The [flutter_ci_jobs.yml](./examples/flutter_ci_jobs.yml) example shows a recommended two-phase workflow that prepares your repository once and then builds every platform concurrently.
-
-**Phase 1 — Prepare & Check** runs on a single `ubuntu-latest` runner and performs all the work that is shared across platforms: `flutter pub get`, optional code generation (`build_runner`, `gen-l10n`), static analysis, and tests. Once everything passes, the fully-prepared workspace is uploaded as a GitHub Actions artifact so the build jobs never need to re-run code generation.
-
-**Phase 2 — Platform builds** start in parallel as soon as Phase 1 succeeds. Each job downloads the prepared workspace, restores pub packages from the Actions cache, and builds its target platform on the appropriate runner (ubuntu for Android/Web/Linux, macos for iOS/macOS, windows for Windows).
-
-```
-Phase 1                        Phase 2 (parallel)
-──────────────────────         ──────────────────────────────────────────
-prepare & check (ubuntu)  →    build-android  (ubuntu-latest)
-                          →    build-ios      (macos-latest)
-                          →    build-web      (ubuntu-latest)
-                          →    build-windows  (windows-latest)
-                          →    build-macos    (macos-latest)
-                          →    build-linux    (ubuntu-latest)
-```
-
-This pattern avoids redundant code-generation on every runner, keeps total wall-clock time close to the slowest single platform build, and gates all platform builds behind a single quality gate.
-
-See [examples/flutter_ci_jobs.yml](./examples/flutter_ci_jobs.yml) for the full workflow.
-
 ## Flutter version and workspaces
 
 This action is primarily tested with the latest Flutter versions and is not tested with older versions of Flutter.
