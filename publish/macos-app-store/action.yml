@@ -13,7 +13,6 @@ inputs:
     required: true
   macos-app-path:
     description: 'Path to the macOS .app bundle (the .pkg file is resolved from the same directory)'
-    required: true
 
 runs:
   using: composite

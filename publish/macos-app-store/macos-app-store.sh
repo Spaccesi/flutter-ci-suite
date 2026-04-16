@@ -16,9 +16,18 @@ if [ "$INSTALLER_IDENTITY" == '' ]; then
 fi
 echo "☑️ Using installer identity: $INSTALLER_IDENTITY"
 
+if [ "$MACOS_APP_PATH" == '' ]; then
+  MACOS_APP_PATH=$(find build/macos/Build/Products/Release -maxdepth 1 -name "*.app" | head -1)
+  if [ "$MACOS_APP_PATH" == '' ]; then
+    echo "::error::🚨 No .app bundle found in build/macos/Build/Products/Release. Provide macos-app-path or build the app first."
+    exit 1
+  fi
+  echo "☑️ Auto-detected app path: $MACOS_APP_PATH"
+fi
 PRODUCTS_DIR=$(dirname "$MACOS_APP_PATH")
-PKG_FILE="$PRODUCTS_DIR/app.pkg"
-productbuild --sign "$INSTALLER_IDENTITY" --component "$MACOS_APP_PATH" /Applications "$PKG_FILE"
+APP_NAME=$(basename "$MACOS_APP_PATH" .app)
+PKG_FILE="$PRODUCTS_DIR/$APP_NAME.pkg"
+productbuild --component "$MACOS_APP_PATH" /Applications --sign "$INSTALLER_IDENTITY" "$PKG_FILE"
 echo "✅ Package created: $PKG_FILE"
 
 echo "▶️ Uploading to App Store Connect"
