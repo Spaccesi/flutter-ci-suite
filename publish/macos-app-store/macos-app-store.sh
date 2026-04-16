@@ -31,5 +31,10 @@ productbuild --component "$MACOS_APP_PATH" /Applications --sign "$INSTALLER_IDEN
 echo "✅ Package created: $PKG_FILE"
 
 echo "▶️ Uploading to App Store Connect"
-xcrun altool --upload-app --type osx --file "$PKG_FILE" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
+ALTOOL_OUTPUT=$(xcrun altool --upload-app --type osx --file "$PKG_FILE" --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID" 2>&1) || true
+echo "$ALTOOL_OUTPUT"
+if echo "$ALTOOL_OUTPUT" | grep -q "^ERROR:"; then
+  echo "::error::🚨 Upload to App Store Connect failed. See output above."
+  exit 1
+fi
 echo "✅ macOS App Store publish complete."
