@@ -50,6 +50,12 @@ if [ "$CODE_SIGN" != 'false' ]; then
   cp $PP_PATH ~/Library/ProvisioningProfiles/$UUID.provisionprofile
 
   echo "✅ Provisioning profile installed (UUID: $UUID)."
+
+  # Patch Xcode project to use manual signing with this profile UUID
+  PBXPROJ="macos/Runner.xcodeproj/project.pbxproj"
+  sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' "$PBXPROJ"
+  sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = \"$UUID\";/g" "$PBXPROJ"
+  echo "✅ Xcode project patched for manual signing (UUID: $UUID)."
 fi
 
 FLAGS="--$BUILD_MODE"
